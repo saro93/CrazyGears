@@ -24,7 +24,7 @@ void ACGearsGMPlay::BeginPlay()
 
         AIcont = Cast<ABucketController>(char2->GetController());
 
-        AIcont->SwitchCharacter(char1);
+        AIcont->PawnDaSeguire(char1);
     }
 }
 
@@ -55,12 +55,12 @@ void ACGearsGMPlay::SwitchControl()
     {
         PLcont->Possess(char2);
         AIcont->Possess(char1);
-        AIcont->SwitchCharacter(char2);
+        AIcont->PawnDaSeguire(char2);
     }
     else // se char 2 è controllato
     {
         PLcont->Possess(char1);
         AIcont->Possess(char2);
-        AIcont->SwitchCharacter(char1);
+        AIcont->PawnDaSeguire(char1);
     }
 }

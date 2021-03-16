@@ -16,5 +16,5 @@ class CGEARS_API ABucketController : public AAIController
 
 public:
 		UFUNCTION(BlueprintImplementableEvent, Category = "AI")
-		void SwitchCharacter(APawn* newTarget);
+		void PawnDaSeguire(APawn* newTarget);
 };

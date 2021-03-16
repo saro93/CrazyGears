@@ -19,8 +19,16 @@ class ACGearsRobot : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
+		class USceneComponent* CameraSpalla;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
+		class USceneComponent* CameraNormal;
+
 public:
 	ACGearsRobot();
+
+	bool aim;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
  
@@ -34,6 +42,8 @@ protected:
 
 
 	void InvokeSwitch();
+
+	void Aiming();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -53,7 +63,7 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-
+	void Tick(float DeltaTime) override;
 
 protected:
 	// APawn interface
