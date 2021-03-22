@@ -5,6 +5,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SceneComponent.h"
+#include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -42,18 +44,24 @@ ACGearsRobot::ACGearsRobot()
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
+	
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
 
 	CameraSpalla = CreateDefaultSubobject<USceneComponent>(TEXT("Soggettiva"));
-	CameraSpalla->SetupAttachment(GetMesh());
+	CameraSpalla->SetupAttachment(GetCapsuleComponent());
+
 
 	CameraNormal = CreateDefaultSubobject<USceneComponent>(TEXT("NormalView"));
 	CameraNormal->SetupAttachment(CameraBoom);
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	//SpallaBoom->CreateDefaultSubobject<USpringArmComponent>(TEXT("SpallaBoom1"));
+	//SpallaBoom->SetupAttachment(CameraSpalla);
+	//SpallaBoom->TargetArmLength = 250.f;
+
 }
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -65,7 +73,7 @@ void ACGearsRobot::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Switch", IE_Pressed, this, &ACGearsRobot::InvokeSwitch);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ACGearsRobot::Aiming);
-
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACGearsRobot::StopAiming);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACGearsRobot::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACGearsRobot::MoveRight);
@@ -98,54 +106,24 @@ void ACGearsRobot::Tick(float DeltaTime)
 
 	if (aim)
 	{
-		// set our turn rates for input
-		BaseTurnRate = 45.f;
-		BaseLookUpRate = 45.f;
-
-		// Don't rotate when the controller rotates. Let that just affect the camera.
-		bUseControllerRotationPitch = false;
-		bUseControllerRotationYaw = false;
-		bUseControllerRotationRoll = false;
-
-		// Configure character movement
-		GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-		GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-		GetCharacterMovement()->JumpZVelocity = 600.f;
-		GetCharacterMovement()->AirControl = 0.2f;
-
-		// Create a camera boom (pulls in towards the player if there is a collision)
-	    
-		auto MC = Cast<APlayerController>(GetController());
-
-		//MC->SetViewTargetWithBlend(CameraSpalla,1.f, EViewTargetBlendFunction::VTBlend_Cubic);
-
-		CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-	
-		FollowCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
+		float temp = GetControlRotation().Pitch;
+		CameraSpalla->SetRelativeRotation(FRotator(temp,0,0));
 	}
-	else
-	{
-		// set our turn rates for input
-		BaseTurnRate = 45.f;
-		BaseLookUpRate = 45.f;
+}
 
-		// Don't rotate when the controller rotates. Let that just affect the camera.
-		bUseControllerRotationPitch = false;
-		bUseControllerRotationYaw = false;
-		bUseControllerRotationRoll = false;
+void ACGearsRobot::BeginPlay()
+{
+     Super::BeginPlay();
 
-		// Configure character movement
-		GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-		GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-		GetCharacterMovement()->AirControl = 0.2f;
+	 
+	 FName SocketName;
+	 CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
+	 CamNorm->AttachToComponent(CameraNormal,FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName = NAME_None);
 
-		
-		CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
-		CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	 CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
+	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName = NAME_None);
 
-	
-		FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	}
+
 }
 
 void ACGearsRobot::InvokeSwitch()
@@ -160,11 +138,63 @@ void ACGearsRobot::InvokeSwitch()
 
 void ACGearsRobot::Aiming()
 {
-	if (!aim)
-	{
 		aim = true;
-	}
-	else { aim = false; }
+		// set our turn rates for input
+		BaseTurnRate = 45.f;
+		BaseLookUpRate = 45.f;
+
+		// Don't rotate when the controller rotates. Let that just affect the camera.
+		bUseControllerRotationPitch = false;
+		bUseControllerRotationYaw = true;
+		bUseControllerRotationRoll = false;
+
+		// Configure character movement
+		GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
+		GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
+
+		// Create a camera boom (pulls in towards the player if there is a collision)
+
+		auto MC = Cast<APlayerController>(GetController());
+
+		MC->SetViewTargetWithBlend(CamAim, 0.25f, EViewTargetBlendFunction::VTBlend_EaseInOut, 1.f, true);
+
+		CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+
+		FollowCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
+
+		struct FHitResult OutHit;
+		const FVector Start = CamAim->GetActorForwardVector();
+		const FVector End = FVector(1000, 0, 0);
+		bool HitAim = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Camera);
+}
+
+void ACGearsRobot::StopAiming()
+{
+	aim = false;
+	BaseTurnRate = 45.f;
+	BaseLookUpRate = 45.f;
+
+	// Don't rotate when the controller rotates. Let that just affect the camera.
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	// Configure character movement
+	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->AirControl = 0.2f;
+
+
+	auto MC = Cast<APlayerController>(GetController());
+
+	MC->SetViewTargetWithBlend(CamNorm, 0.25f, EViewTargetBlendFunction::VTBlend_EaseInOut, 1.f, true);
+
+	// The camera follows at this distance behind the character	
+	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+
+
+	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
 }
 
 void ACGearsRobot::MoveForward(float Value)

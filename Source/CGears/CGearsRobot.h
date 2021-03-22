@@ -15,6 +15,9 @@ class ACGearsRobot : public ACharacter
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* CameraBoom;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		      USpringArmComponent* SpallaBoom;
+
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
@@ -38,12 +41,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	AActor* CamNorm = nullptr;
+	AActor* CamAim = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AActor>GhostActor;
+
 protected:
 
 
 	void InvokeSwitch();
 
 	void Aiming();
+
+	void StopAiming();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -64,6 +75,8 @@ protected:
 	void LookUpAtRate(float Rate);
 
 	void Tick(float DeltaTime) override;
+
+	void BeginPlay() override;
 
 protected:
 	// APawn interface

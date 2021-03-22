@@ -55,7 +55,7 @@ void ACGearsGMPlay::SwitchControl()
     {
         PLcont->Possess(char2);
         AIcont->Possess(char1);
-        AIcont->PawnDaSeguire(char2);
+        //AIcont->PawnDaSeguire(char2);
     }
     else // se char 2 è controllato
     {
