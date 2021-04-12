@@ -142,7 +142,6 @@ bool ACGearsRobot::AimingTrace()
 
 
 	DrawDebugLine(GetWorld(), VistagiocatorePosizione, End, FColor(255, 0, 0), false, 0.1f, 0, 1.f);
-	//if()
 	return false;
 }
 
@@ -171,7 +170,7 @@ void ACGearsRobot::Aiming()
 		// Configure character movement
 		GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
 		GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-
+		GetCharacterMovement()->MaxWalkSpeed = 300;
 		// Create a camera boom (pulls in towards the player if there is a collision)
 
 		auto MC = Cast<APlayerController>(GetController());
@@ -202,7 +201,7 @@ void ACGearsRobot::StopAiming()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->AirControl = 0.2f;
-
+	GetCharacterMovement()->MaxWalkSpeed = 600;
 
 	auto MC = Cast<APlayerController>(GetController());
 

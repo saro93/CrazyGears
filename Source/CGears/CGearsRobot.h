@@ -30,7 +30,7 @@ class ACGearsRobot : public ACharacter
 
 public:
 	ACGearsRobot();
-
+	UPROPERTY(BlueprintReadOnly)
 	bool aim;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
