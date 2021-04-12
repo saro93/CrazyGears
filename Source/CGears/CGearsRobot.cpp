@@ -9,6 +9,7 @@
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "DrawDebugHelpers.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "CGearsGMPlay.h"
@@ -58,9 +59,9 @@ ACGearsRobot::ACGearsRobot()
 	CameraNormal->SetupAttachment(CameraBoom);
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
-	//SpallaBoom->CreateDefaultSubobject<USpringArmComponent>(TEXT("SpallaBoom1"));
-	//SpallaBoom->SetupAttachment(CameraSpalla);
-	//SpallaBoom->TargetArmLength = 250.f;
+    SpallaBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpallaBoom1"));
+	SpallaBoom->SetupAttachment(CameraSpalla);
+	SpallaBoom->TargetArmLength = 250.f;
 
 }
 //////////////////////////////////////////////////////////////////////////
@@ -106,8 +107,10 @@ void ACGearsRobot::Tick(float DeltaTime)
 
 	if (aim)
 	{
+
 		float temp = GetControlRotation().Pitch;
 		CameraSpalla->SetRelativeRotation(FRotator(temp,0,0));
+		AimingTrace();
 	}
 }
 
@@ -124,6 +127,23 @@ void ACGearsRobot::BeginPlay()
 	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName = NAME_None);
 
 
+}
+
+bool ACGearsRobot::AimingTrace()
+{
+
+	struct FHitResult OutHit;
+	FVector VistagiocatorePosizione;
+	FRotator VistagiocatoreRotazione;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(VistagiocatorePosizione, VistagiocatoreRotazione);
+
+	const FVector End = VistagiocatorePosizione + VistagiocatoreRotazione.Vector() * 1000.f;
+	bool HitAim = GetWorld()->LineTraceSingleByChannel(OutHit, VistagiocatorePosizione, End, ECollisionChannel::ECC_Camera);
+
+
+	DrawDebugLine(GetWorld(), VistagiocatorePosizione, End, FColor(255, 0, 0), false, 0.1f, 0, 1.f);
+	//if()
+	return false;
 }
 
 void ACGearsRobot::InvokeSwitch()
@@ -162,10 +182,9 @@ void ACGearsRobot::Aiming()
 
 		FollowCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
 
-		struct FHitResult OutHit;
-		const FVector Start = CamAim->GetActorForwardVector();
-		const FVector End = FVector(1000, 0, 0);
-		bool HitAim = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Camera);
+		
+
+		
 }
 
 void ACGearsRobot::StopAiming()

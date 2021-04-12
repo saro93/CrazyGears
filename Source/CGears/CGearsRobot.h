@@ -78,6 +78,8 @@ protected:
 
 	void BeginPlay() override;
 
+	bool AimingTrace();
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
