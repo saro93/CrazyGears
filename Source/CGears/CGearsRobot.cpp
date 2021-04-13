@@ -7,6 +7,7 @@
 #include "Components/InputComponent.h"
 #include "Components/SceneComponent.h"
 #include "Engine/World.h"
+#include "Weapon.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "DrawDebugHelpers.h"
@@ -117,16 +118,13 @@ void ACGearsRobot::Tick(float DeltaTime)
 void ACGearsRobot::BeginPlay()
 {
      Super::BeginPlay();
-
 	 
-	 FName SocketName;
+
 	 CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
-	 CamNorm->AttachToComponent(CameraNormal,FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName = NAME_None);
+	 CamNorm->AttachToComponent(CameraNormal,FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
 	 CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
-	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName = NAME_None);
-
-
+	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 }
 
 bool ACGearsRobot::AimingTrace()
@@ -140,9 +138,13 @@ bool ACGearsRobot::AimingTrace()
 	const FVector End = VistagiocatorePosizione + VistagiocatoreRotazione.Vector() * 1000.f;
 	bool HitAim = GetWorld()->LineTraceSingleByChannel(OutHit, VistagiocatorePosizione, End, ECollisionChannel::ECC_Camera);
 
-
 	DrawDebugLine(GetWorld(), VistagiocatorePosizione, End, FColor(255, 0, 0), false, 0.1f, 0, 1.f);
 	return false;
+}
+
+void ACGearsRobot::FireAction()
+{
+	CurrentWeapon->Fire();
 }
 
 void ACGearsRobot::InvokeSwitch()
@@ -175,15 +177,15 @@ void ACGearsRobot::Aiming()
 
 		auto MC = Cast<APlayerController>(GetController());
 
-		MC->SetViewTargetWithBlend(CamAim, 0.25f, EViewTargetBlendFunction::VTBlend_EaseInOut, 1.f, true);
+		CameraBoom->Deactivate();
+		SpallaBoom->Activate();
 
+		MC->SetViewTargetWithBlend(CamAim, 0.25f, EViewTargetBlendFunction::VTBlend_EaseInOut, 1.f, true);
+		
 		CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 		FollowCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
 
-		
-
-		
 }
 
 void ACGearsRobot::StopAiming()
@@ -208,8 +210,9 @@ void ACGearsRobot::StopAiming()
 	MC->SetViewTargetWithBlend(CamNorm, 0.25f, EViewTargetBlendFunction::VTBlend_EaseInOut, 1.f, true);
 
 	// The camera follows at this distance behind the character	
+	SpallaBoom->Deactivate();
+	CameraBoom->Activate();
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-
 
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 

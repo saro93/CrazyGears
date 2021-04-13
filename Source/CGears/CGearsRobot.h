@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameFramework/Character.h"
 #include "CGearsRobot.generated.h"
+
 
 UCLASS(config=Game)
 class ACGearsRobot : public ACharacter
@@ -47,6 +49,13 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<AActor>GhostActor;
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class AWeapon>WeaponType;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+		AWeapon* CurrentWeapon;
+
+
 protected:
 
 
@@ -79,6 +88,8 @@ protected:
 	void BeginPlay() override;
 
 	bool AimingTrace();
+
+	void FireAction();
 
 protected:
 	// APawn interface
