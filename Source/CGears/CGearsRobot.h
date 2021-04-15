@@ -87,7 +87,7 @@ protected:
 
 	void BeginPlay() override;
 
-	bool AimingTrace();
+	
 
 	void FireAction();
 

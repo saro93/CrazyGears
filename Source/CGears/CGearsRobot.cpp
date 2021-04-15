@@ -76,6 +76,7 @@ void ACGearsRobot::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Switch", IE_Pressed, this, &ACGearsRobot::InvokeSwitch);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ACGearsRobot::Aiming);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACGearsRobot::StopAiming);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACGearsRobot::FireAction);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACGearsRobot::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACGearsRobot::MoveRight);
@@ -108,10 +109,11 @@ void ACGearsRobot::Tick(float DeltaTime)
 
 	if (aim)
 	{
-
+		FHitResult OutHit;
+		FVector LocHit;
 		float temp = GetControlRotation().Pitch;
 		CameraSpalla->SetRelativeRotation(FRotator(temp,0,0));
-		AimingTrace();
+		CurrentWeapon->AimingTrace(OutHit, LocHit);
 	}
 }
 
@@ -125,22 +127,13 @@ void ACGearsRobot::BeginPlay()
 
 	 CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
 	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
+
+	 CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponType);
+	 CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GripWeapon"));
+	 CurrentWeapon->SetOwner(this);
 }
 
-bool ACGearsRobot::AimingTrace()
-{
 
-	struct FHitResult OutHit;
-	FVector VistagiocatorePosizione;
-	FRotator VistagiocatoreRotazione;
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(VistagiocatorePosizione, VistagiocatoreRotazione);
-
-	const FVector End = VistagiocatorePosizione + VistagiocatoreRotazione.Vector() * 1000.f;
-	bool HitAim = GetWorld()->LineTraceSingleByChannel(OutHit, VistagiocatorePosizione, End, ECollisionChannel::ECC_Camera);
-
-	DrawDebugLine(GetWorld(), VistagiocatorePosizione, End, FColor(255, 0, 0), false, 0.1f, 0, 1.f);
-	return false;
-}
 
 void ACGearsRobot::FireAction()
 {

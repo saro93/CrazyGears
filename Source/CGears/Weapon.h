@@ -43,7 +43,13 @@ public:
 	UFUNCTION(BlueprintPure)
 		FORCEINLINE float GetDamage() { return Damage; }
 
+	UPROPERTY(BlueprintReadOnly)
+	bool Aggancio;
+
+
 	void Fire();
+
+	bool AimingTrace(FHitResult &OutHit, FVector &HitLocation);
 
 protected:
 	// Called when the game starts or when spawned
