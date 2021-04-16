@@ -23,11 +23,21 @@ AWeapon::AWeapon()
 
 }
 
+void AWeapon::SetAmmo(int32 Am)
+{
+	Ammo = Am;
+}
+
+void AWeapon::SetMaxAmmo(int32 MAm)
+{
+	MaxAmmo=MAm;
+}
+
 // Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	Ammo = MaxAmmo;
 }
 
 void AWeapon::Fire()
@@ -46,6 +56,11 @@ void AWeapon::Fire()
 		{
 			UGameplayStatics::ApplyPointDamage(Hit.GetActor(), 10.f,Hit.ImpactNormal, Hit, GetOwner()->GetInstigatorController(), this, Danno);
 			LocHit = Hit.Location;
+
+			if (ImpactEffects[0])
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffects[0], LocHit);
+			}
 		}
 
 		if (FrontFire)
@@ -59,6 +74,8 @@ void AWeapon::Fire()
 
 			PartPointer->SetVectorParameter("BeamEnd", LocHit);
 		}
+
+		
 
 		Ammo -= 1;
 	}

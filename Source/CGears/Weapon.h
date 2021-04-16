@@ -11,6 +11,8 @@ class CGEARS_API AWeapon : public AActor
 {
 	GENERATED_BODY()
 	
+
+
 		UPROPERTY(VisibleAnyWhere)
 		USkeletalMeshComponent* Weapon;
 
@@ -37,17 +39,29 @@ public:
 	UFUNCTION(BlueprintPure)
 		FORCEINLINE int32 GetMaxAmmo() { return MaxAmmo; }
 	
+
+	UFUNCTION(BlueprintPure)
+		void SetAmmo(int32 Am);
+
+	UFUNCTION(BlueprintPure)
+		void SetMaxAmmo(int32 MAm);
+
 	UFUNCTION(BlueprintPure)
 		FORCEINLINE float GetFireRate() { return FireRate; }
 
 	UFUNCTION(BlueprintPure)
 		FORCEINLINE float GetDamage() { return Damage; }
 
+
+	UFUNCTION(BlueprintPure)
+		FORCEINLINE USkeletalMeshComponent* GetWeapon() { return Weapon; }
+
+
 	UPROPERTY(BlueprintReadOnly)
 	bool Aggancio;
 
 
-	void Fire();
+	virtual void Fire();
 
 	bool AimingTrace(FHitResult &OutHit, FVector &HitLocation);
 
@@ -66,5 +80,8 @@ public:
 
 	UPROPERTY(EditdefaultsOnly, Category = "Weapon")
 		UParticleSystem* Scia;
+
+	UPROPERTY(EditdefaultsOnly, Category = "Weapon")
+		TArray<UParticleSystem*> ImpactEffects;
 
 };

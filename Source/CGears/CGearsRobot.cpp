@@ -119,7 +119,7 @@ void ACGearsRobot::Tick(float DeltaTime)
 
 void ACGearsRobot::BeginPlay()
 {
-     Super::BeginPlay();
+    
 	 
 
 	 CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
@@ -131,6 +131,7 @@ void ACGearsRobot::BeginPlay()
 	 CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponType);
 	 CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GripWeapon"));
 	 CurrentWeapon->SetOwner(this);
+	 Super::BeginPlay();
 }
 
 
