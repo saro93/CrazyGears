@@ -17,6 +17,9 @@ class CGEARS_API AGranata : public AActor
 	UPROPERTY(VisibleAnyWhere, Category = "Weapon")
 		class UProjectileMovementComponent* Movement;
 
+	UPROPERTY(EditDefaultsOnly)
+		 TSubclassOf<class AEsplosione>Boom;
+
 
 public:	
 	// Sets default values for this actor's properties
@@ -26,6 +29,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
