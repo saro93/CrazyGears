@@ -2,7 +2,7 @@
 
 
 #include "CGearsGMPlay.h"
-#include "BucketController.h"
+#include "CGears/AI/BucketController.h"
 #include "GameFramework/PlayerController.h"
 
 void ACGearsGMPlay::BeginPlay()
