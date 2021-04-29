@@ -30,6 +30,10 @@ class ACGearsRobot : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
 		class USceneComponent* CameraNormal;
 
+	UPROPERTY(VisibleAnyWhere, Category = "Mesh")
+		class USkeletalMeshComponent* Roomba;
+
+
 public:
 	ACGearsRobot();
 	UPROPERTY(BlueprintReadOnly)
@@ -51,6 +55,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		TArray <TSubclassOf<class AWeapon>>WeaponType;
+	UPROPERTY(EditAnywhere)
+		TArray <TSubclassOf<class AWeapon>>WeaponTypeLeft;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
 		AWeapon* CurrentWeapon;
@@ -94,8 +100,10 @@ protected:
 	void CallWidget();
 
 	void SwitchGun();
-	
+	void SwitchGunLeft();
+
 	int32 ActualWeapon;
+	int32 ActualWeaponLeft;
 
 	void FireAction();
 

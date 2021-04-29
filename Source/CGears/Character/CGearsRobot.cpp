@@ -41,6 +41,8 @@ ACGearsRobot::ACGearsRobot()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
+	Roomba = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
+
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -66,6 +68,7 @@ ACGearsRobot::ACGearsRobot()
 	SpallaBoom->TargetArmLength = 250.f;
 
 	ActualWeapon = 0;
+	ActualWeaponLeft = 0;
 
 	Vita = CreateDefaultSubobject<UHealthComponent>(TEXT("Vita"));
 
@@ -135,8 +138,10 @@ void ACGearsRobot::BeginPlay()
 	 CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
 	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
+	 Roomba->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,TEXT("BottomBody"));
+
 	 SwitchGun();
-	 
+	 SwitchGunLeft();
 }
 
 void ACGearsRobot::SwitchGun()
@@ -162,7 +167,7 @@ void ACGearsRobot::SwitchGun()
 
 		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponType[ActualWeapon]);
 		if(GI->Ammo[ActualWeapon]!=-1)CurrentWeapon->SetAmmo(GI->Ammo[ActualWeapon]);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GripWeapon"));
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BraccioDX"));
 		CurrentWeapon->SetOwner(this);
 		CallWidget();
 
@@ -171,13 +176,50 @@ void ACGearsRobot::SwitchGun()
 
 
 		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponType[ActualWeapon]);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("GripWeapon"));
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BraccioDX"));
 		CurrentWeapon->SetOwner(this);
 		CallWidget();
 	}
 
 
 
+}
+
+void ACGearsRobot::SwitchGunLeft()
+{
+	if (CurrentWeapon)
+	{
+		UGameInstance_CGears* GI = Cast<UGameInstance_CGears>(UGameplayStatics::GetGameInstance(GetWorld()));
+		for (int i = GI->Ammo.Num(); i < WeaponTypeLeft.Num(); i++)
+		{
+			GI->Ammo.Add(-1);
+		}
+
+		GI->Ammo[ActualWeaponLeft] = CurrentWeapon->GetAmmo();
+		CurrentWeapon->Destroy();
+		if (ActualWeaponLeft < WeaponTypeLeft.Num() - 1)
+		{
+			ActualWeaponLeft++;
+		}
+		else {
+			ActualWeaponLeft = 0;
+		}
+
+		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponTypeLeft[ActualWeaponLeft]);
+		if (GI->Ammo[ActualWeaponLeft] != -1)CurrentWeapon->SetAmmo(GI->Ammo[ActualWeaponLeft]);
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BraccioSX"));
+		CurrentWeapon->SetOwner(this);
+		CallWidget();
+
+	}
+	else {
+
+
+		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponTypeLeft[ActualWeaponLeft]);
+		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BraccioSX"));
+		CurrentWeapon->SetOwner(this);
+		CallWidget();
+	}
 }
 
 
