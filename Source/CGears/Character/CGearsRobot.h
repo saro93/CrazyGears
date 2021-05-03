@@ -3,70 +3,56 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "GameFramework/Character.h"
 #include "CGearsRobot.generated.h"
-
 
 UCLASS(config=Game)
 class ACGearsRobot : public ACharacter
 {
 	GENERATED_BODY()
 
-		/** Camera boom positioning the camera behind the character */
-		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* CameraBoom;
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		      USpringArmComponent* SpallaBoom;
+	USpringArmComponent* SpallaBoom;
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
-		class USceneComponent* CameraSpalla;
+	class USceneComponent* CameraSpalla;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
-		class USceneComponent* CameraNormal;
+	class USceneComponent* CameraNormal;
 
 	UPROPERTY(VisibleAnyWhere, Category = "Mesh")
-		class USkeletalMeshComponent* Roomba;
-
+	class USkeletalMeshComponent* Roomba;
 
 public:
 	ACGearsRobot();
+
 	UPROPERTY(BlueprintReadOnly)
 	bool aim;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
- 
 	float BaseTurnRate;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	AActor* CamNorm = nullptr;
-	AActor* CamAim = nullptr;
-
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<AActor>GhostActor;
-
-	UPROPERTY(EditAnywhere)
-		TArray <TSubclassOf<class AWeapon>>WeaponType;
-	UPROPERTY(EditAnywhere)
-		TArray <TSubclassOf<class AWeapon>>WeaponTypeLeft;
-
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
-		AWeapon* CurrentWeapon;
 
 	UPROPERTY(VisibleAnywhere)
-		class UHealthComponent* Vita;
+	class UHealthComponent* Vita;
 
+	class AWeapon* SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeapon* pointer, int32& index, FName AttachPoint);
 
-protected:
+	void SwitchLeft();
 
+	void SwitchRight();
 
 	void InvokeSwitch();
 
@@ -74,48 +60,53 @@ protected:
 
 	void StopAiming();
 
-	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
-	/** Called for side to side input */
 	void MoveRight(float Value);
 
-	/** 
-	 * Called via input to turn at a given rate. 
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
-	 */
 	void TurnAtRate(float Rate);
 
-	/**
-	 * Called via input to turn look up/down at a given rate. 
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
-	 */
 	void LookUpAtRate(float Rate);
 
 	void Tick(float DeltaTime) override;
 
 	void BeginPlay() override;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void CallWidget();
-
-	void SwitchGun();
-	void SwitchGunLeft();
-
-	int32 ActualWeapon;
-	int32 ActualWeaponLeft;
-
-	void FireAction();
-
-protected:
-	// APawn interface
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	// End of APawn interface
-
-public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+protected:
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void CallWidget();
+
+	AActor* CamNorm = nullptr;
+	AActor* CamAim = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor>GhostActor;
+
+	UPROPERTY(EditAnywhere)
+	TArray <TSubclassOf<class AWeapon>>WeaponTypeR;
+	UPROPERTY(EditAnywhere)
+	TArray <TSubclassOf<class AWeapon>>WeaponTypeL;
+
+	UPROPERTY(BlueprintReadWrite)
+	AWeapon* LeftArm;
+
+	UPROPERTY(BlueprintReadWrite)
+	AWeapon* RightArm;
+
+	int32 RightWeapon;
+
+	int32 LeftWeapon;
+
+	void FireAction();
+
+	// APawn interface
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	// End of APawn interface
+
 };
 

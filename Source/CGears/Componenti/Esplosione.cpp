@@ -17,7 +17,7 @@ AEsplosione::AEsplosione()
 	Point = CreateDefaultSubobject<USceneComponent>(TEXT("Centro"));
 	RootComponent = Point;
 	ForzaEsplosiva = CreateDefaultSubobject<URadialForceComponent>(TEXT("ForzaEsplosiva"));
-	ForzaEsplosiva->AttachTo(Point);
+	ForzaEsplosiva->SetupAttachment(Point);
 }
 
 // Called when the game starts or when spawned

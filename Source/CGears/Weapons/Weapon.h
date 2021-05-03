@@ -10,11 +10,9 @@ UCLASS()
 class CGEARS_API AWeapon : public AActor
 {
 	GENERATED_BODY()
-	
 
-
-		UPROPERTY(VisibleAnyWhere)
-		USkeletalMeshComponent* Weapon;
+	UPROPERTY(VisibleAnyWhere)
+	    USkeletalMeshComponent* Weapon;
 
 	UPROPERTY(EditAnyWhere)
 		int32 Ammo;
@@ -28,7 +26,6 @@ class CGEARS_API AWeapon : public AActor
 	UPROPERTY(EditAnyWhere)
 		float Damage;
 
-
 public:	
 	// Sets default values for this actor's properties
 	AWeapon();
@@ -39,7 +36,6 @@ public:
 	UFUNCTION(BlueprintPure)
 		FORCEINLINE int32 GetMaxAmmo() { return MaxAmmo; }
 	
-
 	UFUNCTION(BlueprintPure)
 		int32 SetAmmo(int32 Am);
 

@@ -83,7 +83,7 @@ void AWeapon::Fire()
 
 bool AWeapon::AimingTrace(FHitResult &OutHit, FVector &HitLocation)
 {
-	FVector VistagiocatorePosizione;
+	FVector  VistagiocatorePosizione;
 	FRotator VistagiocatoreRotazione;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(VistagiocatorePosizione, VistagiocatoreRotazione);
 

@@ -23,13 +23,10 @@ ACGearsRobot::ACGearsRobot()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-
 	aim = false;
-
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
-
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -49,7 +46,6 @@ ACGearsRobot::ACGearsRobot()
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
-	
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
@@ -67,11 +63,11 @@ ACGearsRobot::ACGearsRobot()
 	SpallaBoom->SetupAttachment(CameraSpalla);
 	SpallaBoom->TargetArmLength = 250.f;
 
-	ActualWeapon = 0;
-	ActualWeaponLeft = 0;
+	RightWeapon = 0;
+	LeftWeapon = 0;
 
 	Vita = CreateDefaultSubobject<UHealthComponent>(TEXT("Vita"));
-
+	
 }
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -85,15 +81,12 @@ void ACGearsRobot::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ACGearsRobot::Aiming);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACGearsRobot::StopAiming);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACGearsRobot::FireAction);
-	PlayerInputComponent->BindAction("SwitchGun", IE_Pressed, this, &ACGearsRobot::SwitchGun);
-
-
+	PlayerInputComponent->BindAction("SwitchLeft", IE_Pressed, this, &ACGearsRobot::SwitchLeft);
+	PlayerInputComponent->BindAction("SwitchRight", IE_Pressed, this, &ACGearsRobot::SwitchRight);
+     // Bind the press event.
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACGearsRobot::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ACGearsRobot::MoveRight);
 
-	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	// "turn" handles devices that provide an absolute delta, such as a mouse.
-	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &ACGearsRobot::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
@@ -120,10 +113,10 @@ void ACGearsRobot::Tick(float DeltaTime)
 	if (aim)
 	{
 		FHitResult OutHit;
-		FVector LocHit;
+		FVector    LocHit;
 		float temp = GetControlRotation().Pitch;
 		CameraSpalla->SetRelativeRotation(FRotator(temp,0,0));
-		CurrentWeapon->AimingTrace(OutHit, LocHit);
+		RightArm->AimingTrace(OutHit, LocHit);
 	}
 }
 
@@ -131,7 +124,6 @@ void ACGearsRobot::BeginPlay()
 {
 	 Super::BeginPlay();
 	 
-
 	 CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
 	 CamNorm->AttachToComponent(CameraNormal,FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
@@ -139,104 +131,66 @@ void ACGearsRobot::BeginPlay()
 	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
 	 Roomba->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,TEXT("BottomBody"));
+	
+	 RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
 
-	 SwitchGun();
-	 SwitchGunLeft();
+	 LeftArm = SwitchGun(WeaponTypeL, LeftArm,  LeftWeapon, TEXT("BraccioSX"));
+
+	
 }
 
-void ACGearsRobot::SwitchGun()
+AWeapon* ACGearsRobot::SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeapon* pointer, int32& index,FName AttachPoint)
 {
 
-	if (CurrentWeapon)
+	if (pointer)
 	{
 		UGameInstance_CGears* GI = Cast<UGameInstance_CGears>(UGameplayStatics::GetGameInstance(GetWorld()));
-		for (int i = GI->Ammo.Num(); i < WeaponType.Num(); i++)
-		{
-			GI->Ammo.Add(-1);
-		}
 
-		GI->Ammo[ActualWeapon] = CurrentWeapon->GetAmmo();
-		CurrentWeapon->Destroy();
-		if (ActualWeapon < WeaponType.Num()-1)
-		{
-			ActualWeapon++;
-		}
-		else {
-			ActualWeapon = 0;
-		}
+     	for (int i = GI->Ammo.Num(); i < Type.Num(); i++) GI->Ammo.Add(-1);
+		
+		GI->Ammo[index] = pointer->GetAmmo();
 
-		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponType[ActualWeapon]);
-		if(GI->Ammo[ActualWeapon]!=-1)CurrentWeapon->SetAmmo(GI->Ammo[ActualWeapon]);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BraccioDX"));
-		CurrentWeapon->SetOwner(this);
-		CallWidget();
+		pointer->Destroy();
 
+		if (index < Type.Num()-1) index++; else  index = 0;
+		
+		pointer = GetWorld()->SpawnActor<AWeapon>(Type[index]);
+		if(GI->Ammo[index]!=-1) pointer->SetAmmo(GI->Ammo[index]);
+		pointer->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
 	}
-	else {
-
-
-		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponType[ActualWeapon]);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BraccioDX"));
-		CurrentWeapon->SetOwner(this);
-		CallWidget();
+	else 
+	{
+     	pointer = GetWorld()->SpawnActor<AWeapon>(Type[index]);
+		pointer->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
 	}
 
+	pointer->SetOwner(this);
+	CallWidget();
 
-
+	return pointer;
 }
 
-void ACGearsRobot::SwitchGunLeft()
+void ACGearsRobot::SwitchLeft()
 {
-	if (CurrentWeapon)
-	{
-		UGameInstance_CGears* GI = Cast<UGameInstance_CGears>(UGameplayStatics::GetGameInstance(GetWorld()));
-		for (int i = GI->Ammo.Num(); i < WeaponTypeLeft.Num(); i++)
-		{
-			GI->Ammo.Add(-1);
-		}
-
-		GI->Ammo[ActualWeaponLeft] = CurrentWeapon->GetAmmo();
-		CurrentWeapon->Destroy();
-		if (ActualWeaponLeft < WeaponTypeLeft.Num() - 1)
-		{
-			ActualWeaponLeft++;
-		}
-		else {
-			ActualWeaponLeft = 0;
-		}
-
-		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponTypeLeft[ActualWeaponLeft]);
-		if (GI->Ammo[ActualWeaponLeft] != -1)CurrentWeapon->SetAmmo(GI->Ammo[ActualWeaponLeft]);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BraccioSX"));
-		CurrentWeapon->SetOwner(this);
-		CallWidget();
-
-	}
-	else {
-
-
-		CurrentWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponTypeLeft[ActualWeaponLeft]);
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BraccioSX"));
-		CurrentWeapon->SetOwner(this);
-		CallWidget();
-	}
+	LeftArm = SwitchGun(WeaponTypeL, LeftArm, LeftWeapon, TEXT("BraccioSX"));
 }
 
-
+void ACGearsRobot::SwitchRight()
+{
+	RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
+}
 
 void ACGearsRobot::FireAction()
 {
-	CurrentWeapon->Fire();
+	if (RightArm) RightArm->Fire();
 }
 
 void ACGearsRobot::InvokeSwitch()
 {
 	auto gm = GetWorld()->GetAuthGameMode();
 	auto myGM = Cast<ACGearsGMPlay>(gm);
-	if (myGM) 
-	{ 
-		myGM->SwitchTarget(); 
-	}
+	if (myGM)  myGM->SwitchTarget();
+
 }
 
 void ACGearsRobot::Aiming()
