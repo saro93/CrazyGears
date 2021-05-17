@@ -10,9 +10,9 @@ UHealthComponent::UHealthComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	resistenza = 100;
-	energia = 100;
-	vitalita = 100;
+	Maxresistenza = 100;
+	Maxenergia    = 100;
+	Maxvitalita   = 100;
 
 	// ...
 }
@@ -24,9 +24,30 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	resistenza = Maxresistenza;
+	energia    = Maxenergia;
+	vitalita   = Maxvitalita;
+
+	AActor* Owner = GetOwner();
+	if (Owner)
+	{
+		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::Colpito);
+
+	}
+
 }
 
+
+void UHealthComponent::Colpito(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	vitalita = vitalita - Damage;
+	if (vitalita < 0) vitalita = 0;
+	//if (Health == 0) GetOwner()->Destroy();
+	UE_LOG(LogTemp, Log, TEXT("la vitalita' è ora %f"), vitalita);
+
+	OnHpChange.Broadcast(this, vitalita, Damage, DamageType, InstigatedBy, DamageCauser);
+
+}
 
 // Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

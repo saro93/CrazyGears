@@ -23,19 +23,28 @@ class ACGearsRobot : public ACharacter
 	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
-	class USceneComponent* CameraSpalla;
+    USceneComponent* CameraSpalla;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
-	class USceneComponent* CameraNormal;
+	USceneComponent* CameraNormal;
+	
+	UPROPERTY(EditAnyWhere)
+	USkeletalMesh* defaultMesh;
 
 	UPROPERTY(VisibleAnyWhere, Category = "Mesh")
-	class USkeletalMeshComponent* Roomba;
+	USkeletalMeshComponent* Bottom;
+
+
+
 
 public:
 	ACGearsRobot();
 
 	UPROPERTY(BlueprintReadOnly)
 	bool aim;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	bool bLegs;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	float BaseTurnRate;

@@ -38,7 +38,10 @@ ACGearsRobot::ACGearsRobot()
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	Roomba = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body"));
+	Bottom = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Bottom"));
+	Bottom->SkeletalMesh = defaultMesh;
+
+	bLegs = false;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -130,8 +133,9 @@ void ACGearsRobot::BeginPlay()
 	 CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
 	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
-	 Roomba->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetIncludingScale,TEXT("BottomBody"));
+	 Bottom->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BottomBody"));
 	
+
 	 RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
 
 	 LeftArm = SwitchGun(WeaponTypeL, LeftArm,  LeftWeapon, TEXT("BraccioSX"));

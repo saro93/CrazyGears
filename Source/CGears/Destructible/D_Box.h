@@ -23,4 +23,20 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(VisibleAnyWhere)
+	class UHealthComponent* MyHealth = nullptr;
+	UPROPERTY(VisibleAnyWhere)
+	UStaticMeshComponent* Mesh = nullptr;
+
+	UFUNCTION()
+		void Danneggiato(
+			UHealthComponent* CompHealth,
+			float Health,
+			float DeltaHelath,
+			const class UDamageType* DamageType,
+			class AController* Controller,
+			AActor* DamageCauser);
+
+
+	class UDestructibleComponent* Destructible;
 };
