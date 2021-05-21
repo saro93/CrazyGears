@@ -29,7 +29,13 @@ class ACGearsRobot : public ACharacter
 	USceneComponent* CameraNormal;
 	
 	UPROPERTY(EditAnyWhere)
-	USkeletalMesh* defaultMesh;
+	TArray<USkeletalMesh*> BodyMeshes;
+
+	UPROPERTY(EditAnyWhere)
+	TArray<TSubclassOf<UAnimInstance>> AnimBP;
+
+	UPROPERTY(VisibleAnyWhere, Category = "Mesh")
+	USkeletalMeshComponent* Upper;
 
 	UPROPERTY(VisibleAnyWhere, Category = "Mesh")
 	USkeletalMeshComponent* Bottom;
@@ -80,6 +86,8 @@ public:
 	void Tick(float DeltaTime) override;
 
 	void BeginPlay() override;
+
+	void ChangeLegs();
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

@@ -15,6 +15,7 @@
 #include "CGears/GameInstance_CGears.h"
 #include "Kismet/GameplayStatics.h"
 #include "CGears/CGearsGMPlay.h"
+#include "GameFramework/GameUserSettings.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ACGearsRobot
@@ -39,7 +40,9 @@ ACGearsRobot::ACGearsRobot()
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	Bottom = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Bottom"));
-	Bottom->SkeletalMesh = defaultMesh;
+	Bottom->SetupAttachment(GetMesh());
+	Upper = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Upper"));
+	Upper->SetupAttachment(Bottom);
 
 	bLegs = false;
 
@@ -56,7 +59,6 @@ ACGearsRobot::ACGearsRobot()
 
 	CameraSpalla = CreateDefaultSubobject<USceneComponent>(TEXT("Soggettiva"));
 	CameraSpalla->SetupAttachment(GetCapsuleComponent());
-
 
 	CameraNormal = CreateDefaultSubobject<USceneComponent>(TEXT("NormalView"));
 	CameraNormal->SetupAttachment(CameraBoom);
@@ -126,21 +128,40 @@ void ACGearsRobot::Tick(float DeltaTime)
 void ACGearsRobot::BeginPlay()
 {
 	 Super::BeginPlay();
+
 	 
+
 	 CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
 	 CamNorm->AttachToComponent(CameraNormal,FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
 	 CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
 	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
-	 Bottom->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("BottomBody"));
-	
+	 ChangeLegs();
 
 	 RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
 
 	 LeftArm = SwitchGun(WeaponTypeL, LeftArm,  LeftWeapon, TEXT("BraccioSX"));
-
 	
+	
+
+}
+
+void ACGearsRobot::ChangeLegs()
+{
+	if (bLegs)
+	{
+
+		Bottom->SetSkeletalMesh(BodyMeshes[1]);
+		Bottom->SetAnimInstanceClass(AnimBP[1]);
+	}
+	else
+	{
+		Bottom->SetSkeletalMesh(BodyMeshes[0]);
+		Bottom->SetAnimInstanceClass(AnimBP[0]);
+	}
+
+	Upper->AttachToComponent(Bottom, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Attach"));
 }
 
 AWeapon* ACGearsRobot::SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeapon* pointer, int32& index,FName AttachPoint)
@@ -149,6 +170,9 @@ AWeapon* ACGearsRobot::SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeap
 	if (pointer)
 	{
 		UGameInstance_CGears* GI = Cast<UGameInstance_CGears>(UGameplayStatics::GetGameInstance(GetWorld()));
+		
+		auto Settings = GEngine->GetGameUserSettings();
+		Settings->SetVSyncEnabled(true);
 
      	for (int i = GI->Ammo.Num(); i < Type.Num(); i++) GI->Ammo.Add(-1);
 		
@@ -160,12 +184,12 @@ AWeapon* ACGearsRobot::SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeap
 		
 		pointer = GetWorld()->SpawnActor<AWeapon>(Type[index]);
 		if(GI->Ammo[index]!=-1) pointer->SetAmmo(GI->Ammo[index]);
-		pointer->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
+		pointer->AttachToComponent(Upper, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
 	}
 	else 
 	{
      	pointer = GetWorld()->SpawnActor<AWeapon>(Type[index]);
-		pointer->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
+		pointer->AttachToComponent(Upper, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
 	}
 
 	pointer->SetOwner(this);
