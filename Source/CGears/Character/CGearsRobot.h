@@ -42,9 +42,15 @@ class ACGearsRobot : public ACharacter
 
 
 
-
 public:
 	ACGearsRobot();
+
+	UPROPERTY(BlueprintReadOnly)
+		float InputRight;
+
+	UPROPERTY(BlueprintReadOnly)
+		float InputForward;
+
 
 	UPROPERTY(BlueprintReadOnly)
 	bool aim;

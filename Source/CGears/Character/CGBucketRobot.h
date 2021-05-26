@@ -10,6 +10,8 @@ UCLASS()
 class CGEARS_API ACGBucketRobot : public ACharacter
 {
 	GENERATED_BODY()
+
+
 public:
 		float BaseTurnRate;
 

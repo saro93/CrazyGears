@@ -41,6 +41,7 @@ ACGearsRobot::ACGearsRobot()
 
 	Bottom = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Bottom"));
 	Bottom->SetupAttachment(GetMesh());
+
 	Upper = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Upper"));
 	Upper->SetupAttachment(Bottom);
 
@@ -70,6 +71,12 @@ ACGearsRobot::ACGearsRobot()
 
 	RightWeapon = 0;
 	LeftWeapon = 0;
+
+	InputRight = 0;
+
+
+	InputForward = 0;
+
 
 	Vita = CreateDefaultSubobject<UHealthComponent>(TEXT("Vita"));
 	
@@ -291,8 +298,13 @@ void ACGearsRobot::MoveForward(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Direction, Value);	
 	}
+
+	float delta = GetWorld()->GetDeltaSeconds();
+
+	InputForward = FMath::FInterpTo(InputForward, Value * 180.f, delta,3.f);
+
 }
 
 void ACGearsRobot::MoveRight(float Value)
@@ -305,6 +317,10 @@ void ACGearsRobot::MoveRight(float Value)
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Direction, Value);	
 	}
+	float delta = GetWorld()->GetDeltaSeconds();
+
+	InputRight = FMath::FInterpTo(InputRight, Value * 180.f, delta, 3.f);
+
 }

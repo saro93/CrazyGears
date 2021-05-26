@@ -11,22 +11,26 @@ class CGEARS_API AD_Box : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
-	AD_Box();
+
+	UPROPERTY(VisibleAnyWhere)
+		class UHealthComponent* MyHealth = nullptr;
+
+	UPROPERTY(VisibleAnyWhere)
+		class UBoxComponent* Trigger = nullptr;
+
+	UPROPERTY(VisibleAnyWhere)
+		class UDestructibleComponent* Destructible;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
+
+
+	AD_Box();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UPROPERTY(VisibleAnyWhere)
-	class UHealthComponent* MyHealth = nullptr;
-	UPROPERTY(VisibleAnyWhere)
-	UStaticMeshComponent* Mesh = nullptr;
 
 	UFUNCTION()
 		void Danneggiato(
@@ -38,5 +42,4 @@ public:
 			AActor* DamageCauser);
 
 
-	class UDestructibleComponent* Destructible;
 };

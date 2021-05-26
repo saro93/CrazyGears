@@ -3,7 +3,7 @@
 
 #include "D_Box.h"
 #include "DestructibleComponent.h"
-//#include "../DestructibleProp.h"
+#include "Components/BoxComponent.h"
 #include "../Componenti/HealthComponent.h"
 
 // Sets default values
@@ -11,12 +11,16 @@ AD_Box::AD_Box()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 	MyHealth = CreateDefaultSubobject<UHealthComponent>(TEXT("Health"));
+	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger"));
 
 	Destructible = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Destructible"));
+	Destructible->SetNotifyRigidBodyCollision(true);
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	RootComponent = Mesh;
+	Trigger->SetupAttachment(RootComponent);
+	Destructible->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -35,7 +39,7 @@ void AD_Box::Tick(float DeltaTime)
 
 void AD_Box::Danneggiato(UHealthComponent* CompHealth, float Health, float DeltaHelath, const UDamageType* DamageType, AController* Controller, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Error, TEXT("Colpito"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Hitted"));
 
 }
 
