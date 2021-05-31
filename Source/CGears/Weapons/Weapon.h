@@ -12,50 +12,33 @@ class CGEARS_API AWeapon : public AActor
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnyWhere)
-	    USkeletalMeshComponent* Weapon;
+	USkeletalMeshComponent* Weapon;
 
 	UPROPERTY(EditAnyWhere)
-		int32 Ammo;
+	float FireRate;
 
 	UPROPERTY(EditAnyWhere)
-		int32 MaxAmmo;
+	float Damage;
 
-	UPROPERTY(EditAnyWhere)
-		float FireRate;
 
-	UPROPERTY(EditAnyWhere)
-		float Damage;
 
 public:	
 	// Sets default values for this actor's properties
 	AWeapon();
 
-	UFUNCTION(BlueprintPure)
-		FORCEINLINE int32 GetAmmo() { return Ammo; }
-	
-	UFUNCTION(BlueprintPure)
-		FORCEINLINE int32 GetMaxAmmo() { return MaxAmmo; }
-	
-	UFUNCTION(BlueprintPure)
-		int32 SetAmmo(int32 Am);
+	class UHealthComponent* OwnerHealth;
 
 	UFUNCTION(BlueprintPure)
-		int32 SetMaxAmmo(int32 MAm);
+	FORCEINLINE float GetFireRate() { return FireRate; }
 
 	UFUNCTION(BlueprintPure)
-		FORCEINLINE float GetFireRate() { return FireRate; }
+	FORCEINLINE float GetDamage() { return Damage; }
 
 	UFUNCTION(BlueprintPure)
-		FORCEINLINE float GetDamage() { return Damage; }
-
-
-	UFUNCTION(BlueprintPure)
-		FORCEINLINE USkeletalMeshComponent* GetWeapon() { return Weapon; }
-
+	FORCEINLINE USkeletalMeshComponent* GetWeapon() { return Weapon; }
 
 	UPROPERTY(BlueprintReadOnly)
 	bool Aggancio;
-
 
 	virtual void Fire();
 
@@ -65,7 +48,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	
+	UPROPERTY(EditAnyWhere)
+	float Consumo;
 
 public:	
 	// Called every frame

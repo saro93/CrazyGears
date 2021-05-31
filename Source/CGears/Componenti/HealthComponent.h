@@ -46,14 +46,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
 		float Maxenergia;
 
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE	float GetEnergyPercent() { return energia / Maxenergia; };
 
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE	float GetVitalityPercent() { return vitalita / Maxvitalita; };
+
+	bool balive;
+
+	bool bactive;
 
 	UFUNCTION()
 	void Colpito(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

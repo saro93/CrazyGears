@@ -3,21 +3,23 @@
 
 #include "W_LanciaGranate.h"
 #include "Granata.h"
+#include "CGears/Componenti/HealthComponent.h"
 
 AW_LanciaGranate::AW_LanciaGranate()
 {
 
-	SetAmmo(10);
-	SetMaxAmmo(10);
-
+	
+	
+	Consumo = 5;
 }
 
 void AW_LanciaGranate::Fire()
 {
 
-	if (GetAmmo() > 0 && ToSpawn)
+
+	if (OwnerHealth->energia > 0 && ToSpawn)
 	{
-		SetAmmo(GetAmmo()-1);
+		OwnerHealth->energia -= Consumo;
 
 		GetWorld()->SpawnActor<AGranata>
 			(ToSpawn, GetWeapon()->GetSocketLocation(TEXT("Muzzle")), GetActorForwardVector().Rotation());
