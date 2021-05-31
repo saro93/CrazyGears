@@ -11,14 +11,14 @@ class CGEARS_API AGranata : public AActor
 {
 	GENERATED_BODY()
 	
-		UPROPERTY(VisibleAnyWhere, Category = "Weapon")
-		UStaticMeshComponent* Mesh;
+	UPROPERTY(VisibleAnyWhere, Category = "Weapon")
+	UStaticMeshComponent* Mesh;
 
 	UPROPERTY(VisibleAnyWhere, Category = "Weapon")
-		class UProjectileMovementComponent* Movement;
+	class UProjectileMovementComponent* Movement;
 
 	UPROPERTY(EditDefaultsOnly)
-		 TSubclassOf<class AEsplosione>Boom;
+	TSubclassOf<class AEsplosione>Boom;
 
 
 public:	

@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "CGears/Componenti/HealthComponent.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -15,40 +16,31 @@ AWeapon::AWeapon()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	RootComponent= Weapon;
 
-	MaxAmmo = 30;
-	Ammo = MaxAmmo;
 	FireRate = 0.1f;
 	Aggancio = false;
-	Damage = 10;
+	Damage  = 10;
+	Consumo = 2;
 
 }
 
-int32 AWeapon::SetAmmo(int32 Am)
-{
-	return Ammo = Am;
-}
 
-int32 AWeapon::SetMaxAmmo(int32 MAm)
-{
-	return MaxAmmo=MAm;
-}
 
 // Called when the game starts or when spawned
 void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	Ammo = MaxAmmo;
+
 }
 
 void AWeapon::Fire()
 {
-	if (Ammo > 0)
+	if (OwnerHealth->energia > 0)
 	{
 		FVector LocHit;
 		FHitResult Hit;
 		FVector StartPoint = Weapon->GetSocketLocation(TEXT("Muzzle"));
 		bool colpito = AimingTrace(Hit,LocHit);
-		//DrawDebugLine(GetWorld(), StartPoint, EndPoint, FColor::Red, false, 1.f, 0, 1.f);
+		
 		
 		TSubclassOf<UDamageType> Danno;
 
@@ -75,9 +67,7 @@ void AWeapon::Fire()
 			PartPointer->SetVectorParameter("BeamEnd", LocHit);
 		}
 
-		
-
-		Ammo -= 1;
+		OwnerHealth->energia -= Consumo;
 	}
 }
 

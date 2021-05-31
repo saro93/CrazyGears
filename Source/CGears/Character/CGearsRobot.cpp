@@ -58,14 +58,6 @@ ACGearsRobot::ACGearsRobot()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
 
-	//CameraSpalla = CreateDefaultSubobject<USceneComponent>(TEXT("Soggettiva"));
-	//CameraSpalla->SetupAttachment(GetCapsuleComponent());
-
-	/*CameraNormal = CreateDefaultSubobject<USceneComponent>(TEXT("NormalView"));
-	CameraNormal->SetupAttachment(CameraBoom);*/
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
-	// 
     ShoulderBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("ShoulderBoom"));
 	ShoulderBoom->SetupAttachment(GetCapsuleComponent());
 	ShoulderBoom->TargetArmLength = 250.f;
@@ -127,10 +119,29 @@ void ACGearsRobot::Tick(float DeltaTime)
 	{
 		FHitResult OutHit;
 		FVector    LocHit;
-		float temp = GetControlRotation().Pitch;
+		//float temp = GetControlRotation().Pitch;
 		//CameraSpalla->SetRelativeRotation(FRotator(temp,0,0));
 		RightArm->AimingTrace(OutHit, LocHit);
 	}
+
+
+	if (Vita->bactive)
+	{
+		if (Vita->energia > 0)
+		{
+			Vita->energia -= DeltaTime;
+		}
+		else
+		{
+			Bottom->SetSimulatePhysics(true);
+			Upper->SetSimulatePhysics(true);
+			Bottom->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+			Vita->bactive = false;
+		}
+	}
+	
+
 }
 
 void ACGearsRobot::BeginPlay()
@@ -177,26 +188,24 @@ AWeapon* ACGearsRobot::SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeap
 
 	if (pointer)
 	{
-		UGameInstance_CGears* GI = Cast<UGameInstance_CGears>(UGameplayStatics::GetGameInstance(GetWorld()));
+		
 		
 		auto Settings = GEngine->GetGameUserSettings();
 		Settings->SetVSyncEnabled(true);
 
-     	for (int i = GI->Ammo.Num(); i < Type.Num(); i++) GI->Ammo.Add(-1);
-		
-		GI->Ammo[index] = pointer->GetAmmo();
-
+   
 		pointer->Destroy();
 
 		if (index < Type.Num()-1) index++; else  index = 0;
 		
 		pointer = GetWorld()->SpawnActor<AWeapon>(Type[index]);
-		if(GI->Ammo[index]!=-1) pointer->SetAmmo(GI->Ammo[index]);
+		pointer->OwnerHealth = Vita;
 		pointer->AttachToComponent(Upper, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
 	}
 	else 
 	{
      	pointer = GetWorld()->SpawnActor<AWeapon>(Type[index]);
+		pointer->OwnerHealth = Vita;
 		pointer->AttachToComponent(Upper, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
 	}
 

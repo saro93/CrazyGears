@@ -16,18 +16,12 @@ class ACGearsRobot : public ACharacter
 	class USpringArmComponent* CameraBoom = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-		USpringArmComponent* ShoulderBoom = nullptr;
+	USpringArmComponent* ShoulderBoom = nullptr;
 
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera = nullptr;
 
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
-    USceneComponent* CameraSpalla;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
-	USceneComponent* CameraNormal;*/
-	
 	UPROPERTY(EditAnyWhere)
 	TArray<USkeletalMesh*> BodyMeshes;
 
@@ -41,7 +35,6 @@ class ACGearsRobot : public ACharacter
 	USkeletalMeshComponent* Bottom;
 
 
-
 public:
 	ACGearsRobot();
 
@@ -50,7 +43,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 		float InputForward;
-
 
 	UPROPERTY(BlueprintReadOnly)
 	bool aim;
@@ -65,8 +57,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	class UHealthComponent* Vita;
 
 	class AWeapon* SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeapon* pointer, int32& index, FName AttachPoint);
