@@ -58,16 +58,17 @@ ACGearsRobot::ACGearsRobot()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm	
 
-	CameraSpalla = CreateDefaultSubobject<USceneComponent>(TEXT("Soggettiva"));
-	CameraSpalla->SetupAttachment(GetCapsuleComponent());
+	//CameraSpalla = CreateDefaultSubobject<USceneComponent>(TEXT("Soggettiva"));
+	//CameraSpalla->SetupAttachment(GetCapsuleComponent());
 
-	CameraNormal = CreateDefaultSubobject<USceneComponent>(TEXT("NormalView"));
-	CameraNormal->SetupAttachment(CameraBoom);
+	/*CameraNormal = CreateDefaultSubobject<USceneComponent>(TEXT("NormalView"));
+	CameraNormal->SetupAttachment(CameraBoom);*/
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
-    SpallaBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpallaBoom1"));
-	SpallaBoom->SetupAttachment(CameraSpalla);
-	SpallaBoom->TargetArmLength = 250.f;
+	// 
+    ShoulderBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("ShoulderBoom"));
+	ShoulderBoom->SetupAttachment(GetCapsuleComponent());
+	ShoulderBoom->TargetArmLength = 250.f;
 
 	RightWeapon = 0;
 	LeftWeapon = 0;
@@ -127,7 +128,7 @@ void ACGearsRobot::Tick(float DeltaTime)
 		FHitResult OutHit;
 		FVector    LocHit;
 		float temp = GetControlRotation().Pitch;
-		CameraSpalla->SetRelativeRotation(FRotator(temp,0,0));
+		//CameraSpalla->SetRelativeRotation(FRotator(temp,0,0));
 		RightArm->AimingTrace(OutHit, LocHit);
 	}
 }
@@ -139,10 +140,10 @@ void ACGearsRobot::BeginPlay()
 	 
 
 	 CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
-	 CamNorm->AttachToComponent(CameraNormal,FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
+	 CamNorm->AttachToComponent(CameraBoom,FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
 	 CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
-	 CamAim->AttachToComponent(SpallaBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
+	 CamAim->AttachToComponent(ShoulderBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
 	 ChangeLegs();
 
@@ -249,7 +250,7 @@ void ACGearsRobot::Aiming()
 		auto MC = Cast<APlayerController>(GetController());
 
 		CameraBoom->Deactivate();
-		SpallaBoom->Activate();
+		ShoulderBoom->Activate();
 
 		MC->SetViewTargetWithBlend(CamAim, 0.25f, EViewTargetBlendFunction::VTBlend_EaseInOut, 1.f, true);
 		
@@ -281,7 +282,7 @@ void ACGearsRobot::StopAiming()
 	MC->SetViewTargetWithBlend(CamNorm, 0.25f, EViewTargetBlendFunction::VTBlend_EaseInOut, 1.f, true);
 
 	// The camera follows at this distance behind the character	
-	SpallaBoom->Deactivate();
+	ShoulderBoom->Deactivate();
 	CameraBoom->Activate();
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 

@@ -12,21 +12,21 @@ class ACGearsRobot : public ACharacter
 	GENERATED_BODY()
 
 	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* SpallaBoom;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+		USpringArmComponent* ShoulderBoom = nullptr;
 
 	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* FollowCamera = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
     USceneComponent* CameraSpalla;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PointCamera, meta = (AllowPrivateAccess = "true"))
-	USceneComponent* CameraNormal;
+	USceneComponent* CameraNormal;*/
 	
 	UPROPERTY(EditAnyWhere)
 	TArray<USkeletalMesh*> BodyMeshes;
