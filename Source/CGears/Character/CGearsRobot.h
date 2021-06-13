@@ -62,6 +62,8 @@ public:
 
 	class AWeapon* SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeapon* pointer, int32& index, FName AttachPoint);
 
+
+
 	void SwitchLeft();
 
 	void SwitchRight();
@@ -69,6 +71,8 @@ public:
 	void InvokeSwitch();
 
 	void Aiming();
+
+	void MyJump();
 
 	void StopAiming();
 
@@ -96,7 +100,7 @@ protected:
 	void CallWidget();
 
 	AActor* CamNorm = nullptr;
-	AActor* CamAim = nullptr;
+	AActor* CamAim  = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor>GhostActor;

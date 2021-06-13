@@ -80,17 +80,23 @@ void ACGearsRobot::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACGearsRobot::MyJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
 	PlayerInputComponent->BindAction("Switch", IE_Pressed, this, &ACGearsRobot::InvokeSwitch);
+
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ACGearsRobot::Aiming);
-	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACGearsRobot::StopAiming);
+    PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACGearsRobot::StopAiming);
+
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACGearsRobot::FireAction);
-	PlayerInputComponent->BindAction("SwitchLeft", IE_Pressed, this, &ACGearsRobot::SwitchLeft);
+
+	PlayerInputComponent->BindAction("SwitchLeft" , IE_Pressed, this, &ACGearsRobot::SwitchLeft);
 	PlayerInputComponent->BindAction("SwitchRight", IE_Pressed, this, &ACGearsRobot::SwitchRight);
+	PlayerInputComponent->BindAction("SwitchLegs" , IE_Pressed, this, &ACGearsRobot::ChangeLegs);
+
      // Bind the press event.
 	PlayerInputComponent->BindAxis("MoveForward", this, &ACGearsRobot::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ACGearsRobot::MoveRight);
+	PlayerInputComponent->BindAxis("MoveRight",   this, &ACGearsRobot::MoveRight);
 
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &ACGearsRobot::TurnAtRate);
@@ -170,9 +176,17 @@ void ACGearsRobot::ChangeLegs()
 {
 	if (bLegs)
 	{
-
-		Bottom->SetSkeletalMesh(BodyMeshes[1]);
-		Bottom->SetAnimInstanceClass(AnimBP[1]);
+		if (Bottom->SkeletalMesh == BodyMeshes[0])
+        {
+			Bottom->SetSkeletalMesh(BodyMeshes[1]);
+			Bottom->SetAnimInstanceClass(AnimBP[1]);
+		}
+		else
+		{
+			Bottom->SetSkeletalMesh(BodyMeshes[0]);
+			Bottom->SetAnimInstanceClass(AnimBP[0]);
+		}
+	
 	}
 	else
 	{
@@ -189,11 +203,9 @@ AWeapon* ACGearsRobot::SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeap
 	if (pointer)
 	{
 		
-		
 		auto Settings = GEngine->GetGameUserSettings();
 		Settings->SetVSyncEnabled(true);
-
-   
+  
 		pointer->Destroy();
 
 		if (index < Type.Num()-1) index++; else  index = 0;
@@ -222,14 +234,23 @@ void ACGearsRobot::SwitchLeft()
 
 void ACGearsRobot::SwitchRight()
 {
-	RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
+	if (!aim)
+	{
+		RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
+	}
 }
 
 void ACGearsRobot::FireAction()
 {
-	if (RightArm) RightArm->Fire();
+	if (RightArm && aim)
+	{
+
+		RightArm->Fire();
+
+	}
 }
 
+// cambia da robot a secchio 
 void ACGearsRobot::InvokeSwitch()
 {
 	auto gm = GetWorld()->GetAuthGameMode();
@@ -240,6 +261,9 @@ void ACGearsRobot::InvokeSwitch()
 
 void ACGearsRobot::Aiming()
 {
+
+	if (RightWeapon > 0)
+	{
 		aim = true;
 		// set our turn rates for input
 		BaseTurnRate = 45.f;
@@ -262,11 +286,16 @@ void ACGearsRobot::Aiming()
 		ShoulderBoom->Activate();
 
 		MC->SetViewTargetWithBlend(CamAim, 0.25f, EViewTargetBlendFunction::VTBlend_EaseInOut, 1.f, true);
-		
+
 		CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 		FollowCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
+	}
+}
 
+void ACGearsRobot::MyJump()
+{
+	if (Bottom->SkeletalMesh == BodyMeshes[1]) Jump();
 }
 
 void ACGearsRobot::StopAiming()
@@ -277,7 +306,7 @@ void ACGearsRobot::StopAiming()
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw  = false;
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
