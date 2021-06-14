@@ -15,6 +15,8 @@ public:
 	// Sets default values for this actor's properties
 	ALifter();
 
+	bool  Active;
+
 	int32 stato;
 
 	UPROPERTY(EditAnyWhere)
@@ -31,18 +33,39 @@ public:
 	UPROPERTY(VisibleAnyWhere)
 	USceneComponent* Mov;
 
+	class ACGearsRobot* Key = nullptr;
+
+	UPROPERTY(VisibleAnyWhere)
+    class UBoxComponent* terminalA;
+
+	UPROPERTY(VisibleAnyWhere)
+	      UBoxComponent* terminalB;
+
 	UPROPERTY(VisibleAnyWhere)
 	TArray<UStaticMeshComponent*> Mobile;
 
 	UPROPERTY(VisibleAnyWhere)
 	TArray<UStaticMeshComponent*> Static;
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void Activate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void DeActivate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 protected:
+	// Called when the game starts or when spawned
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnyWhere)
+	USoundBase* SMove;
+
+	UPROPERTY(EditAnyWhere)
+	USoundBase* SStop;
+
 
 };

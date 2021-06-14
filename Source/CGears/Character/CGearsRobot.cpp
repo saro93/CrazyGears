@@ -20,24 +20,29 @@
 //////////////////////////////////////////////////////////////////////////
 // ACGearsRobot
 
+void ACGearsRobot::StopAction()
+{
+	bAction = false;
+}
+
 ACGearsRobot::ACGearsRobot()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 	aim = false;
 	// set our turn rates for input
-	BaseTurnRate = 45.f;
+	BaseTurnRate   = 45.f;
 	BaseLookUpRate = 45.f;
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw   = false;
+	bUseControllerRotationRoll  = false;
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->JumpZVelocity = 480.f;
+	GetCharacterMovement()->AirControl = 0.4f;
 
 	Bottom = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Bottom"));
 	Bottom->SetupAttachment(GetMesh());
@@ -45,7 +50,8 @@ ACGearsRobot::ACGearsRobot()
 	Upper = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Upper"));
 	Upper->SetupAttachment(Bottom);
 
-	bLegs = false;
+	bLegs   = false;
+	bAction = false;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -66,16 +72,13 @@ ACGearsRobot::ACGearsRobot()
 	LeftWeapon = 0;
 
 	InputRight = 0;
-
-
 	InputForward = 0;
-
+	
 
 	Vita = CreateDefaultSubobject<UHealthComponent>(TEXT("Vita"));
 	
 }
-//////////////////////////////////////////////////////////////////////////
-// Input
+
 void ACGearsRobot::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
@@ -89,6 +92,8 @@ void ACGearsRobot::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
     PlayerInputComponent->BindAction("Aim", IE_Released, this, &ACGearsRobot::StopAiming);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ACGearsRobot::FireAction);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ACGearsRobot::StopAction);
+
 
 	PlayerInputComponent->BindAction("SwitchLeft" , IE_Pressed, this, &ACGearsRobot::SwitchLeft);
 	PlayerInputComponent->BindAction("SwitchRight", IE_Pressed, this, &ACGearsRobot::SwitchRight);
@@ -244,10 +249,14 @@ void ACGearsRobot::FireAction()
 {
 	if (RightArm && aim)
 	{
-
-		RightArm->Fire();
-
+	RightArm->Fire();
 	}
+
+	if (!aim)
+	{
+		bAction = true;
+	}
+
 }
 
 // cambia da robot a secchio 

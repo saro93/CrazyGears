@@ -34,15 +34,18 @@ class ACGearsRobot : public ACharacter
 	UPROPERTY(VisibleAnyWhere, Category = "Mesh")
 	USkeletalMeshComponent* Bottom;
 
+	void StopAction();
 
 public:
 	ACGearsRobot();
 
-	UPROPERTY(BlueprintReadOnly)
-		float InputRight;
+	bool bAction;
 
 	UPROPERTY(BlueprintReadOnly)
-		float InputForward;
+	float InputRight;
+
+	UPROPERTY(BlueprintReadOnly)
+	float InputForward;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool aim;
