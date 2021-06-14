@@ -19,6 +19,8 @@ public:
 
 	int32 stato;
 
+	float delay;
+
 	UPROPERTY(EditAnyWhere)
 	int32 mode = 0; // 0 = deactivated // 1 = work on call // 2 = work on time
 

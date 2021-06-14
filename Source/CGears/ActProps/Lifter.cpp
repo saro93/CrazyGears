@@ -20,6 +20,9 @@ ALifter::ALifter()
 
 	mode     = 0;
 
+	delay = 10000;
+	
+
 	active   = false;
 
 	Stat = CreateDefaultSubobject<USceneComponent>(TEXT("Stat"));
@@ -73,7 +76,7 @@ void ALifter::Tick(float DeltaTime)
 				SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SMove, GetActorLocation());
 
 			}
-	    }
+		}
 
 	}
 	break;
@@ -82,14 +85,15 @@ void ALifter::Tick(float DeltaTime)
 	{
 		if (Mov->GetRelativeLocation().Z < distance)
 		{
+			
 			Mov->SetRelativeLocation(Mov->GetRelativeLocation() + FVector(0, 0, 100 * DeltaTime));
 		}
-		else 
+		else
 		{
 			if (SActual)
 			{
 				SActual->Stop();
-				SActual = nullptr;
+				SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SStop, GetActorLocation());
 			}
 			stato = 2;
 		}
@@ -103,9 +107,10 @@ void ALifter::Tick(float DeltaTime)
 			if (Key->bAction)
 			{
 				stato = 3;
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), SStop, GetActorLocation());
 
-				
+				SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SMove, GetActorLocation());
+
+
 
 			}
 
@@ -117,14 +122,24 @@ void ALifter::Tick(float DeltaTime)
 	{
 		if (Mov->GetRelativeLocation().Z > 0)
 		{
+			
 			Mov->SetRelativeLocation(Mov->GetRelativeLocation() - FVector(0, 0, 100 * DeltaTime));
 		}
-		else stato = 0;
-	}
-	break;
+		else {
+
+			//stato = 0;
+			if (SActual)
+			{
+				SActual->Stop();
+			    UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SStop, GetActorLocation());
+
+			}
+			stato = 0;
+		}
+		break;
 
 	}
-
+	}
 
 }
 
