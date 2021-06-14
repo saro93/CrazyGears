@@ -15,11 +15,14 @@ class CGEARS_API UGameInstance_CGears : public UGameInstance
 	GENERATED_BODY()
 
 public:
+
 	UGameInstance_CGears();
 
+	UPROPERTY(BlueprintReadWrite)
+	bool bElevatorActive;
 
-        TArray<int32> Ammo;
-	    TArray<int32> MaxAmmo;
-
+	UPROPERTY(BlueprintReadWrite)
+	bool bLegActive;
+	
 
 };

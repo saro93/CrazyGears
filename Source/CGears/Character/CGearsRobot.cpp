@@ -50,9 +50,6 @@ ACGearsRobot::ACGearsRobot()
 	Upper = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Upper"));
 	Upper->SetupAttachment(Bottom);
 
-	bLegs   = false;
-	bAction = false;
-
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -73,7 +70,9 @@ ACGearsRobot::ACGearsRobot()
 
 	InputRight = 0;
 	InputForward = 0;
-	
+
+	bAction = false;
+
 
 	Vita = CreateDefaultSubobject<UHealthComponent>(TEXT("Vita"));
 	
@@ -159,8 +158,6 @@ void ACGearsRobot::BeginPlay()
 {
 	 Super::BeginPlay();
 
-	 
-
 	 CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
 	 CamNorm->AttachToComponent(CameraBoom,FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
 
@@ -172,34 +169,41 @@ void ACGearsRobot::BeginPlay()
 	 RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
 
 	 LeftArm = SwitchGun(WeaponTypeL, LeftArm,  LeftWeapon, TEXT("BraccioSX"));
-	
-	
 
 }
 
 void ACGearsRobot::ChangeLegs()
 {
-	if (bLegs)
+	
+	auto MGI = Cast<UGameInstance_CGears>(UGameplayStatics::GetGameInstance(GetWorld()));
+
+	if (MGI)
 	{
-		if (Bottom->SkeletalMesh == BodyMeshes[0])
-        {
-			Bottom->SetSkeletalMesh(BodyMeshes[1]);
-			Bottom->SetAnimInstanceClass(AnimBP[1]);
+
+		if (MGI->bLegActive)
+		{
+			if (Bottom->SkeletalMesh == BodyMeshes[0])
+			{
+				Bottom->SetSkeletalMesh(BodyMeshes[1]);
+				Bottom->SetAnimInstanceClass(AnimBP[1]);
+			}
+			else
+			{
+				Bottom->SetSkeletalMesh(BodyMeshes[0]);
+				Bottom->SetAnimInstanceClass(AnimBP[0]);
+			}
+
 		}
 		else
 		{
 			Bottom->SetSkeletalMesh(BodyMeshes[0]);
 			Bottom->SetAnimInstanceClass(AnimBP[0]);
 		}
-	
-	}
-	else
-	{
-		Bottom->SetSkeletalMesh(BodyMeshes[0]);
-		Bottom->SetAnimInstanceClass(AnimBP[0]);
+
+		Upper->AttachToComponent(Bottom, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Attach"));
+
 	}
 
-	Upper->AttachToComponent(Bottom, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("Attach"));
 }
 
 AWeapon* ACGearsRobot::SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeapon* pointer, int32& index,FName AttachPoint)

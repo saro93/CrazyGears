@@ -7,4 +7,9 @@
 UGameInstance_CGears::UGameInstance_CGears()
 {
 
+	bElevatorActive = false;
+
+    bLegActive = false;
+
+
 }

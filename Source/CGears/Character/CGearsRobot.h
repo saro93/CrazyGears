@@ -50,9 +50,6 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool aim;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
-	bool bLegs;
-
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	float BaseTurnRate;
 

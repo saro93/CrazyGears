@@ -20,7 +20,7 @@ public:
 	int32 stato;
 
 	UPROPERTY(EditAnyWhere)
-	int32 mode = 0;
+	int32 mode = 0; // 0 = deactivated // 1 = work on call // 2 = work on time
 
 	UPROPERTY(EditAnyWhere)
 	float distance;
@@ -32,6 +32,8 @@ public:
 
 	UPROPERTY(VisibleAnyWhere)
 	USceneComponent* Mov;
+
+
 
 	class ACGearsRobot* Key = nullptr;
 
@@ -67,5 +69,6 @@ protected:
 	UPROPERTY(EditAnyWhere)
 	USoundBase* SStop;
 
+	class UAudioComponent* SActual = nullptr;
 
 };

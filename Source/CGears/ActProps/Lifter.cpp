@@ -5,6 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "CGears/Character/CGearsRobot.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 
 // Sets default values
@@ -68,7 +69,9 @@ void ALifter::Tick(float DeltaTime)
 			if (Key->bAction)
 			{
 				stato = 1;
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(),SMove,GetActorLocation());
+
+				SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SMove, GetActorLocation());
+
 			}
 	    }
 
@@ -81,7 +84,15 @@ void ALifter::Tick(float DeltaTime)
 		{
 			Mov->SetRelativeLocation(Mov->GetRelativeLocation() + FVector(0, 0, 100 * DeltaTime));
 		}
-		else stato = 2;
+		else 
+		{
+			if (SActual)
+			{
+				SActual->Stop();
+				SActual = nullptr;
+			}
+			stato = 2;
+		}
 	}
 	break;
 
@@ -93,6 +104,9 @@ void ALifter::Tick(float DeltaTime)
 			{
 				stato = 3;
 				UGameplayStatics::PlaySoundAtLocation(GetWorld(), SStop, GetActorLocation());
+
+				
+
 			}
 
 		}
