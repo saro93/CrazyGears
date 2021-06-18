@@ -9,7 +9,9 @@ UGameInstance_CGears::UGameInstance_CGears()
 
 	bElevatorActive = false;
 
-    bLegActive = false;
+    bLegActive      = false;
 
+    bDoorsActive    = false;
 
+    bSpecialActive  = false;
 }

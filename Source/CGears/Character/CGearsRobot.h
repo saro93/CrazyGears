@@ -48,7 +48,7 @@ public:
 	float InputForward;
 
 	UPROPERTY(BlueprintReadOnly)
-	bool aim;
+	bool  aim;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	float BaseTurnRate;
@@ -61,8 +61,6 @@ public:
 	class UHealthComponent* Vita;
 
 	class AWeapon* SwitchGun(TArray <TSubclassOf<class AWeapon>> Type, AWeapon* pointer, int32& index, FName AttachPoint);
-
-
 
 	void SwitchLeft();
 

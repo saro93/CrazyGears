@@ -49,8 +49,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE	float GetEnergyPercent() { return energia / Maxenergia; };
 
-	UFUNCTION(BlueprintPure)
-	FORCEINLINE	float GetVitalityPercent() { return vitalita / Maxvitalita; };
+	//UFUNCTION(BlueprintPure)
+	//FORCEINLINE	float GetVitalityPercent() { return vitalita / Maxvitalita; };
 
 	bool balive;
 

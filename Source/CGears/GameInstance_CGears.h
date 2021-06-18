@@ -24,5 +24,10 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bLegActive;
 	
+	UPROPERTY(BlueprintReadWrite)
+	bool bDoorsActive;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bSpecialActive;
 
 };

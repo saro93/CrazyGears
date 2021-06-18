@@ -28,7 +28,6 @@ ACGBucketRobot::ACGBucketRobot()
 	GetCharacterMovement()->JumpZVelocity = 100.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 }
-
 // Called when the game starts or when spawned
 void ACGBucketRobot::BeginPlay()
 {

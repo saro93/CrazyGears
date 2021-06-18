@@ -17,14 +17,7 @@
 #include "CGears/CGearsGMPlay.h"
 #include "GameFramework/GameUserSettings.h"
 
-//////////////////////////////////////////////////////////////////////////
-// ACGearsRobot
-
-void ACGearsRobot::StopAction()
-{
-	bAction = false;
-}
-
+//constructor script
 ACGearsRobot::ACGearsRobot()
 {
 	// Set size for collision capsule
@@ -78,6 +71,24 @@ ACGearsRobot::ACGearsRobot()
 	
 }
 
+void ACGearsRobot::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
+	CamNorm->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale, NAME_None);
+
+	CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
+	CamAim->AttachToComponent(ShoulderBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale, NAME_None);
+
+	ChangeLegs();
+
+	RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
+
+	LeftArm = SwitchGun(WeaponTypeL, LeftArm, LeftWeapon, TEXT("BraccioSX"));
+
+}
+
 void ACGearsRobot::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
@@ -121,6 +132,42 @@ void ACGearsRobot::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void ACGearsRobot::MoveForward(float Value)
+{
+	if ((Controller != NULL) && (Value != 0.0f))
+	{
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// get forward vector
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		AddMovementInput(Direction, Value);
+	}
+
+	float delta = GetWorld()->GetDeltaSeconds();
+
+	InputForward = FMath::FInterpTo(InputForward, Value * 180.f, delta, 3.f);
+
+}
+
+void ACGearsRobot::MoveRight(float Value)
+{
+	if ((Controller != NULL) && (Value != 0.0f))
+	{
+		// find out which way is right
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// get right vector 
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// add movement in that direction
+		AddMovementInput(Direction, Value);
+	}
+	float delta = GetWorld()->GetDeltaSeconds();
+
+	InputRight = FMath::FInterpTo(InputRight, Value * 180.f, delta, 3.f);
+
+}
+
 void ACGearsRobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -143,7 +190,7 @@ void ACGearsRobot::Tick(float DeltaTime)
 		}
 		else
 		{
-			Bottom->SetSimulatePhysics(true);
+			Bottom->SetSimulatePhysics(true);  //later we must use death animation!
 			Upper->SetSimulatePhysics(true);
 			Bottom->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
@@ -154,22 +201,9 @@ void ACGearsRobot::Tick(float DeltaTime)
 
 }
 
-void ACGearsRobot::BeginPlay()
+void ACGearsRobot::StopAction()
 {
-	 Super::BeginPlay();
-
-	 CamNorm = GetWorld()->SpawnActor<AActor>(GhostActor);
-	 CamNorm->AttachToComponent(CameraBoom,FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
-
-	 CamAim = GetWorld()->SpawnActor<AActor>(GhostActor);
-	 CamAim->AttachToComponent(ShoulderBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale,NAME_None);
-
-	 ChangeLegs();
-
-	 RightArm = SwitchGun(WeaponTypeR, RightArm, RightWeapon, TEXT("BraccioDX"));
-
-	 LeftArm = SwitchGun(WeaponTypeL, LeftArm,  LeftWeapon, TEXT("BraccioSX"));
-
+	bAction = false;
 }
 
 void ACGearsRobot::ChangeLegs()
@@ -306,11 +340,6 @@ void ACGearsRobot::Aiming()
 	}
 }
 
-void ACGearsRobot::MyJump()
-{
-	if (Bottom->SkeletalMesh == BodyMeshes[1]) Jump();
-}
-
 void ACGearsRobot::StopAiming()
 {
 	aim = false;
@@ -341,38 +370,8 @@ void ACGearsRobot::StopAiming()
 
 }
 
-void ACGearsRobot::MoveForward(float Value)
+void ACGearsRobot::MyJump()
 {
-	if ((Controller != NULL) && (Value != 0.0f))
-	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);	
-	}
-
-	float delta = GetWorld()->GetDeltaSeconds();
-
-	InputForward = FMath::FInterpTo(InputForward, Value * 180.f, delta,3.f);
-
+	if (Bottom->SkeletalMesh == BodyMeshes[1]) Jump();
 }
 
-void ACGearsRobot::MoveRight(float Value)
-{
-	if ( (Controller != NULL) && (Value != 0.0f) )
-	{
-		// find out which way is right
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// add movement in that direction
-		AddMovementInput(Direction, Value);	
-	}
-	float delta = GetWorld()->GetDeltaSeconds();
-
-	InputRight = FMath::FInterpTo(InputRight, Value * 180.f, delta, 3.f);
-
-}
