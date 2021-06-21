@@ -10,26 +10,52 @@ UCLASS()
 class CGEARS_API ATorretta : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ATorretta();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "body", meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* MeshBase = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "body", meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* PiattoMobile = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "body", meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* Cannoni = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
-		class UBoxComponent* boxCol;
+	int state;
+
+	UPROPERTY(EditAnywhere)
+	float Stop;
+
+	UPROPERTY(EditAnywhere)
+	float DetectSize;
+
+	bool Aiming;
+
+
+	float RStop;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	FRotator ActualRot;
+	FRotator StartRot;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	// Sets default values for this actor's properties
+	ATorretta();
+
+	UPROPERTY(EditAnywhere)
+	float Speed;
+
+	UPROPERTY(EditAnywhere)
+	bool  FullMode;
+
+	UPROPERTY(EditAnywhere)
+	float Angle;
+
+	UPROPERTY(EditAnywhere)
+	float MaxDetect;
+
 
 };
