@@ -20,6 +20,13 @@ class CGEARS_API ATorretta : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "body", meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* Cannoni = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "body", meta = (AllowPrivateAccess = "true"))
+		USceneComponent* FirePointA = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "body", meta = (AllowPrivateAccess = "true"))
+		USceneComponent* FirePointB = nullptr;
+
+
 	int state;
 
 	UPROPERTY(EditAnywhere)
@@ -27,9 +34,6 @@ class CGEARS_API ATorretta : public AActor
 
 	UPROPERTY(EditAnywhere)
 	float DetectSize;
-
-	bool Aiming;
-
 
 	float RStop;
 
@@ -39,11 +43,20 @@ protected:
 
 	FRotator ActualRot;
 	FRotator StartRot;
+
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void Detect(float DeltaTime);
 	// Sets default values for this actor's properties
 	ATorretta();
+
+	FTimerHandle AfterDetect;
+
+	AActor* Detected = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float Speed;

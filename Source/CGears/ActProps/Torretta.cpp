@@ -20,23 +20,23 @@ ATorretta::ATorretta()
 	PiattoMobile->SetupAttachment(MeshBase);
 	Cannoni->SetupAttachment(PiattoMobile);
 
+	// movement rate
 	Speed     = 10;
-    
+    // full rotation or not
 	FullMode  = true;
-
+	// rotation angle ( mode not full )
 	Angle     = 90.f;
 
+	// max distance of enemy detection
 	MaxDetect = 1000;
 
 	state = 0;
 
+	// time the turret stop when change direction
     Stop  = 2;
 
 	RStop = 0;
-
-	Aiming = false;
-
-
+	// detect capsule size (use negative value if turret is flipped)
 	DetectSize = 90.f;
 }
 
@@ -53,14 +53,38 @@ void ATorretta::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	if (!Detected)
+	{
+		Detect(DeltaTime);
+	}
+	else
+	{
+		FVector Pos    = GetActorLocation();
+		FVector Target = Detected->GetActorLocation();
+     	FVector Rot = Target - Pos;
+    	Rot.Normalize();
+
+		FRotator ACtRot = Cannoni->GetComponentRotation();
+	    ACtRot.Pitch = -Rot.Rotation().Pitch;
+	
+		Cannoni->SetWorldRotation(ACtRot);
+
+
+		DrawDebugLine(GetWorld(), FirePointA->GetComponentLocation() , FirePointA->GetComponentLocation() + ACtRot.Vector() * -1000, FColor::Red,   false);
+		DrawDebugLine(GetWorld(), FirePointB->GetComponentLocation() , FirePointB->GetComponentLocation() + ACtRot.Vector() * -1000, FColor::Green, false);
+	}
+}
+
+void ATorretta::Detect(float DeltaTime)
+{
 	FVector StartP = GetActorLocation();
-	FVector EndP = StartP+ActualRot.Vector() * MaxDetect;
+	FVector EndP = StartP + ActualRot.Vector() * MaxDetect;
 
 	if (FullMode)
 	{
 		ActualRot.Yaw += Speed * DeltaTime;
 		PiattoMobile->SetWorldRotation(ActualRot);
-
 	}
 	else
 	{
@@ -69,17 +93,17 @@ void ATorretta::Tick(float DeltaTime)
 
 		case 0: // move right
 
-		ActualRot.Yaw += Speed * DeltaTime;
+			ActualRot.Yaw += Speed * DeltaTime;
 
-		PiattoMobile->SetWorldRotation(ActualRot);
-		
-		if (ActualRot.Yaw >= StartRot.Yaw + Angle)
-		{
-			RStop = Stop;
-			state++;
-		}
+			PiattoMobile->SetWorldRotation(ActualRot);
 
-		break;
+			if (ActualRot.Yaw >= StartRot.Yaw + Angle)
+			{
+				RStop = Stop;
+				state++;
+			}
+
+			break;
 
 		case 1:  // stop
 			if (RStop > 0) RStop -= DeltaTime;
@@ -88,7 +112,7 @@ void ATorretta::Tick(float DeltaTime)
 				state++;
 			}
 
-		break;
+			break;
 
 		case 2:  //move right
 
@@ -102,7 +126,7 @@ void ATorretta::Tick(float DeltaTime)
 				state++;
 			}
 
-		break;
+			break;
 
 		case 3:  //stop
 			if (RStop > 0) RStop -= DeltaTime;
@@ -111,7 +135,7 @@ void ATorretta::Tick(float DeltaTime)
 				state = 0;
 			}
 
-		break;
+			break;
 
 		}
 
@@ -119,26 +143,26 @@ void ATorretta::Tick(float DeltaTime)
 
 	FHitResult MyHit;
 
-	FColor MCol = FColor::Green;
+//	FColor MCol = FColor::Green;
 
-	FCollisionShape ColCaps = FCollisionShape::MakeCapsule(40.f, abs(DetectSize));
+	FCollisionShape ColCaps = FCollisionShape::MakeCapsule(20.f, abs(DetectSize));
 
-	bool hitted = GetWorld()->SweepSingleByObjectType(MyHit, StartP + FVector(0, 0, DetectSize), EndP + FVector(0, 0, DetectSize),FQuat::Identity,ECC_Pawn, ColCaps);
+	bool hitted = GetWorld()->SweepSingleByObjectType(MyHit, StartP + FVector(0, 0, DetectSize), EndP + FVector(0, 0, DetectSize), FQuat::Identity, ECC_Pawn, ColCaps);
 
 	if (hitted)
 	{
-		auto temp = Cast<ACGearsRobot>(MyHit.GetActor());
+		Detected  = Cast<ACGearsRobot>(MyHit.GetActor());
 
-		if (temp)
+		/*
+		if (Detected)
 		{
-			MCol = FColor::Red;
-		}
+			MCol = FColor::Red;	
+		}*/
 
-
+		
 	}
 
 	//DrawDebugSphere(GetWorld(), EndP, 50, 16, FColor::Red);
-	DrawDebugCapsule(GetWorld(), EndP+FVector(0,0, DetectSize), abs(DetectSize),60.f, FQuat::Identity, MCol);
-
+	//DrawDebugCapsule(GetWorld(), EndP + FVector(0, 0, DetectSize), abs(DetectSize), 60.f, FQuat::Identity, MCol);
 }
 
