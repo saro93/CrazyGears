@@ -39,7 +39,7 @@ class ACGearsRobot : public ACharacter
 public:
 	ACGearsRobot();
 
-	bool bAction;
+	bool  bAction;
 
 	UPROPERTY(BlueprintReadOnly)
 	float InputRight;
@@ -98,6 +98,7 @@ protected:
 	void CallWidget();
 
 	AActor* CamNorm = nullptr;
+
 	AActor* CamAim  = nullptr;
 
 	UPROPERTY(EditAnywhere)

@@ -9,10 +9,8 @@ UHealthComponent::UHealthComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	Maxresistenza = 100;
 	Maxenergia    = 100;
-	Maxvitalita   = 100;
+
 	bactive = true;
 	balive  = true;
 	// ...
@@ -25,9 +23,9 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	resistenza = Maxresistenza;
+
 	energia    = Maxenergia;
-	vitalita   = Maxvitalita;
+
 
 	AActor* Owner = GetOwner();
 	if (Owner)
@@ -41,12 +39,12 @@ void UHealthComponent::BeginPlay()
 
 void UHealthComponent::Colpito(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	vitalita = vitalita - Damage;
-	if (vitalita < 0) vitalita = 0;
+	energia = energia - Damage;
+	if (energia < 0) energia = 0;
 	//if (Health == 0) GetOwner()->Destroy();
-	UE_LOG(LogTemp, Log, TEXT("la vitalita' è ora %f"), vitalita);
+	UE_LOG(LogTemp, Log, TEXT("la vitalita' è ora %f"), energia);
 
-	OnHpChange.Broadcast(this, vitalita, Damage, DamageType, InstigatedBy, DamageCauser);
+	OnHpChange.Broadcast(this, energia, Damage, DamageType, InstigatedBy, DamageCauser);
 
 }
 

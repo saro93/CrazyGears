@@ -30,4 +30,6 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	bool bSpecialActive;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool bBucketActive;
 };

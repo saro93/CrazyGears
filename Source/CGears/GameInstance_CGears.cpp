@@ -14,4 +14,6 @@ UGameInstance_CGears::UGameInstance_CGears()
     bDoorsActive    = false;
 
     bSpecialActive  = false;
+
+    bBucketActive   = false;
 }
