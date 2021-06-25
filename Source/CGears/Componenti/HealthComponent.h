@@ -28,20 +28,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Game|Damage")
 		FOnHPChangeSignature OnHpChange;
 
-	UPROPERTY(BlueprintReadWrite,Category = "Health")
-		float resistenza;
-
-	UPROPERTY( BlueprintReadWrite, Category = "Health")
-	    float vitalita;
-
 	UPROPERTY( BlueprintReadWrite, Category = "Health")
 		float energia;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
-		float Maxresistenza;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
-		float Maxvitalita;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
 		float Maxenergia;
