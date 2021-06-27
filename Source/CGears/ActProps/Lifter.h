@@ -15,19 +15,19 @@ public:
 	// Sets default values for this actor's properties
 	ALifter();
 
-	bool  Active;
+	//bool  Active;
 
 	int32 stato;
 
-	float delay;
+	//float delay;
 
 	UPROPERTY(EditAnyWhere)
-	int32 mode = 0; // 0 = deactivated // 1 = work on call // 2 = work on time
+	int32 mode = 0; // 0 = normal  1// mode start over
 
 	UPROPERTY(EditAnyWhere)
 	float distance;
 
-	bool active;
+	//bool active;
 
 	UPROPERTY(VisibleAnyWhere)
 	USceneComponent* Stat;
@@ -35,15 +35,13 @@ public:
 	UPROPERTY(VisibleAnyWhere)
 	USceneComponent* Mov;
 
-
-
 	class ACGearsRobot* Key = nullptr;
 
 	UPROPERTY(VisibleAnyWhere)
     class UBoxComponent* terminalA;
 
 	UPROPERTY(VisibleAnyWhere)
-	      UBoxComponent* terminalB;
+	UBoxComponent* terminalB;
 
 	UPROPERTY(VisibleAnyWhere)
 	TArray<UStaticMeshComponent*> Mobile;

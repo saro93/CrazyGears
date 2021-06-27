@@ -21,10 +21,9 @@ ALifter::ALifter()
 
 	mode     = 0;
 
-	delay = 10000;
+	//delay    = 10000;
 	
-
-	active   = false;
+	//active   = false;
 
 	Stat = CreateDefaultSubobject<USceneComponent>(TEXT("Stat"));
 	RootComponent = Stat;
@@ -32,7 +31,7 @@ ALifter::ALifter()
 	Mov = CreateDefaultSubobject<USceneComponent>(TEXT("Mov"));
 	Mov->SetupAttachment(Stat);
 
-	Active = false;
+	
 
 	terminalA = CreateDefaultSubobject<UBoxComponent>(TEXT("terminalA"));
 	terminalA->SetupAttachment(RootComponent);
@@ -63,84 +62,89 @@ void ALifter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	switch (stato)
-	{
 
-	case 0: // static Down
-	{
-		if (Key)
+
+		switch (stato)
 		{
-			if (Key->bAction)
+
+		case 0: // static Down
+		{
+			if (Key)
 			{
-				stato = 1;
+				if (Key->bAction)
+				{
+					stato = 1;
 
-				SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SMove, GetActorLocation());
+					SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SMove, GetActorLocation());
 
-			}
-		}
-
-	}
-	break;
-
-	case 1: // lift
-	{
-		if (Mov->GetRelativeLocation().Z < distance)
-		{
-			
-			Mov->SetRelativeLocation(Mov->GetRelativeLocation() + FVector(0, 0, 100 * DeltaTime));
-		}
-		else
-		{
-			if (SActual)
-			{
-				SActual->Stop();
-				SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SStop, GetActorLocation());
-			}
-			stato = 2;
-		}
-	}
-	break;
-
-	case 2: // static Up
-	{
-		if (Key)
-		{
-			if (Key->bAction)
-			{
-				stato = 3;
-
-				SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SMove, GetActorLocation());
-
-
-
+				}
 			}
 
-		}
-	}
-	break;
-
-	case 3: // falling
-	{
-		if (Mov->GetRelativeLocation().Z > 0)
-		{
-			
-			Mov->SetRelativeLocation(Mov->GetRelativeLocation() - FVector(0, 0, 100 * DeltaTime));
-		}
-		else {
-
-			//stato = 0;
-			if (SActual)
-			{
-				SActual->Stop();
-			    UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SStop, GetActorLocation());
-
-			}
-			stato = 0;
 		}
 		break;
 
-	}
-	}
+		case 1: // lift
+		{
+			if (Mov->GetRelativeLocation().Z < distance)
+			{
+
+				Mov->SetRelativeLocation(Mov->GetRelativeLocation() + FVector(0, 0, 100 * DeltaTime));
+			}
+			else
+			{
+				if (SActual)
+				{
+					SActual->Stop();
+					SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SStop, GetActorLocation());
+				}
+				stato = 2;
+			}
+		}
+		break;
+
+		case 2: // static Up
+		{
+			if (Key)
+			{
+				if (Key->bAction)
+				{
+					stato = 3;
+
+					SActual = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SMove, GetActorLocation());
+
+
+
+				}
+
+			}
+		}
+		break;
+
+		case 3: // falling
+		{
+			if (Mov->GetRelativeLocation().Z > 0)
+			{
+
+				Mov->SetRelativeLocation(Mov->GetRelativeLocation() - FVector(0, 0, 100 * DeltaTime));
+			}
+			else {
+
+				//stato = 0;
+				if (SActual)
+				{
+					SActual->Stop();
+					UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SStop, GetActorLocation());
+
+				}
+				stato = 0;
+			}
+			break;
+
+		}
+		}
+	
+	
+
 
 }
 
@@ -148,7 +152,7 @@ void ALifter::Activate(UPrimitiveComponent* OverlappedComponent, AActor* OtherAc
 {
 	auto GI = Cast<UGameInstance_CGears>(GetGameInstance());
 
-	if (GI && GI->bElevatorActive)
+	if ((GI && GI->bElevatorActive)   || mode == 1)
 	{
 		auto temp = Cast<ACGearsRobot>(OtherActor);
 
@@ -164,7 +168,7 @@ void ALifter::DeActivate(UPrimitiveComponent* OverlappedComponent, AActor* Other
 {
 	auto GI = Cast<UGameInstance_CGears>(GetGameInstance());
 
-	if (GI && GI->bElevatorActive)
+	if ((GI && GI->bElevatorActive) || mode == 1)
 	{
 		auto temp = Cast<ACGearsRobot>(OtherActor);
 
@@ -182,4 +186,14 @@ void ALifter::BeginPlay()
 	terminalB->OnComponentBeginOverlap.AddDynamic(this, &ALifter::Activate);
 	terminalA->OnComponentEndOverlap.AddDynamic(this, &ALifter::DeActivate);
 	terminalB->OnComponentEndOverlap.AddDynamic(this, &ALifter::DeActivate);
+
+
+	if (mode == 1)
+	{
+		FVector Actual = Mov->GetRelativeLocation();
+		Actual.Z = distance;
+		Mov->SetRelativeLocation(Actual);
+		stato = 2;
+	}
+
 }
