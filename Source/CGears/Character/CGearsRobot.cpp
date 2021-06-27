@@ -4,12 +4,12 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
-#include "Components/SceneComponent.h"
+//#include "Components/SceneComponent.h"
 #include "Engine/World.h"
 #include "CGears/Weapons/Weapon.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
-#include "DrawDebugHelpers.h"
+//#include "DrawDebugHelpers.h"
 #include "CGears/Componenti/HealthComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "CGears/GameInstance_CGears.h"
@@ -300,9 +300,15 @@ void ACGearsRobot::FireAction()
 // cambia da robot a secchio 
 void ACGearsRobot::InvokeSwitch()
 {
-	auto gm = GetWorld()->GetAuthGameMode();
-	auto myGM = Cast<ACGearsGMPlay>(gm);
-	if (myGM)  myGM->SwitchTarget();
+
+	auto GI = Cast<UGameInstance_CGears>(GetGameInstance());
+
+	if (GI && GI->bBucketActive)
+	{
+		auto gm = GetWorld()->GetAuthGameMode();
+		auto myGM = Cast<ACGearsGMPlay>(gm);
+		if (myGM)  myGM->SwitchTarget();
+	}
 
 }
 

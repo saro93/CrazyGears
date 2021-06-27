@@ -3,6 +3,8 @@
 
 #include "CGearsGMPlay.h"
 #include "CGears/AI/BucketController.h"
+#include "Engine/TargetPoint.h"
+#include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 
 void ACGearsGMPlay::BeginPlay()
@@ -15,9 +17,25 @@ void ACGearsGMPlay::BeginPlay()
 
     if (char1) {
 
-        FVector SpawnLoc = char1->GetActorLocation();
-        SpawnLoc.X += 250;
-        char2 = GetWorld()->SpawnActor<APawn>(AllyKind, SpawnLoc, char1->GetActorRotation());
+
+        for (TActorIterator<ATargetPoint> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+        {
+            // Same as with the Object Iterator, access the subclass instance with the * or -> operators.
+            BucketStart = *ActorItr;
+        }
+
+        if (BucketStart)
+        {
+            FVector SpawnLoc = BucketStart->GetActorLocation();
+            SpawnLoc.Z += 50;
+            char2 = GetWorld()->SpawnActor<APawn>(AllyKind, SpawnLoc, char1->GetActorRotation());
+        }
+        else
+        {
+            FVector SpawnLoc = char1->GetActorLocation();
+            SpawnLoc.X += 150;
+            char2 = GetWorld()->SpawnActor<APawn>(AllyKind, SpawnLoc, char1->GetActorRotation());
+        }
     }
 
     if (char2) {

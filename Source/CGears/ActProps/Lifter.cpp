@@ -6,6 +6,7 @@
 #include "CGears/Character/CGearsRobot.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "CGears/GameInstance_CGears.h"
 
 
 // Sets default values
@@ -145,25 +146,33 @@ void ALifter::Tick(float DeltaTime)
 
 void ALifter::Activate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	auto temp = Cast<ACGearsRobot>(OtherActor);
+	auto GI = Cast<UGameInstance_CGears>(GetGameInstance());
 
-	if (temp)
+	if (GI && GI->bElevatorActive)
 	{
-	//active = true;
-	Key = temp;
-	}
+		auto temp = Cast<ACGearsRobot>(OtherActor);
 
+		if (temp)
+		{
+			//active = true;
+			Key = temp;
+		}
+	}
 }
 
 void ALifter::DeActivate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	auto temp = Cast<ACGearsRobot>(OtherActor);
+	auto GI = Cast<UGameInstance_CGears>(GetGameInstance());
 
-	if (temp)
+	if (GI && GI->bElevatorActive)
 	{
-	Key = nullptr;
-	}
+		auto temp = Cast<ACGearsRobot>(OtherActor);
 
+		if (temp)
+		{
+		Key = nullptr;
+		}
+	}
 }
 
 void ALifter::BeginPlay()

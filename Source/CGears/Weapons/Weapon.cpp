@@ -2,7 +2,7 @@
 
 
 #include "Weapon.h"
-#include "DrawDebugHelpers.h"
+//#include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "CGears/Componenti/HealthComponent.h"
@@ -39,6 +39,8 @@ void AWeapon::Fire()
 		FVector LocHit;
 		FHitResult Hit;
 		FVector StartPoint = Weapon->GetSocketLocation(TEXT("Muzzle"));
+
+		//FTransform STransform = Weapon->GetSocketTransform(TEXT("Muzzle"));
 		bool colpito = AimingTrace(Hit,LocHit);
 		
 		

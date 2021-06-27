@@ -18,6 +18,9 @@ class CGEARS_API ACGearsGMPlay : public AGameModeBase
 
 		public:
 
+	UPROPERTY(EditAnywhere)
+	class ATargetPoint* BucketStart;
+
     APawn* char1 = nullptr;
 	APawn* char2 = nullptr;
 
